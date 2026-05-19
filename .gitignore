@@ -1,0 +1,22 @@
+﻿# Build output
+[Bb]in/
+[Oo]bj/
+
+# JetBrains Rider
+.idea/
+*.DotSettings.user
+*.sln.iml
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userprefs
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude Code per-project settings (drop if you want to commit them)
+.claude/
+CLAUDE.md

@@ -1,0 +1,51 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <Nullable>enable</Nullable>
+        <LangVersion>14</LangVersion>
+        <RootNamespace>Wandering</RootNamespace>
+        <AssemblyName>Wandering</AssemblyName>
+        <UnityEditorPath>C:\Program Files\Unity\Hub\Editor\6000.3.10f1\Editor\Data</UnityEditorPath>
+        <TargetProjectPath>C:\0. UnityProjects\TestFrame</TargetProjectPath>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\BearCore\BearCore.csproj"/>
+        <ProjectReference Include="..\BearRP\BearRP.csproj"/>
+        <Reference Include="UnityEngine.CoreModule">
+            <HintPath>$(UnityEditorPath)\Managed\UnityEngine\UnityEngine.CoreModule.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="UnityEngine.Editor">
+            <HintPath>$(UnityEditorPath)\Managed\UnityEditor.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="UnityEngine.IMGUIModule">
+            <HintPath>$(UnityEditorPath)\Managed\UnityEngine\UnityEngine.IMGUIModule.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="Unity.InputSystem">
+            <HintPath>$(TargetProjectPath)\Library\ScriptAssemblies\Unity.InputSystem.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="Sirenix.OdinInspector.Attributes">
+            <HintPath>$(TargetProjectPath)\Assets\Plugins\Sirenix\Assemblies\Sirenix.OdinInspector.Attributes.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="Sirenix.Serialization">
+            <HintPath>C:\0. UnityProjects\TestFrame\Assets\Plugins\Sirenix\Assemblies\Sirenix.Serialization.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Generated\" />
+    </ItemGroup>
+
+    <Target Name="TestBuild" AfterTargets="Build">
+        <Copy SourceFiles="$(OutputPath)$(AssemblyName).dll"
+              DestinationFolder="$(TargetProjectPath)\Assets\Plugins"
+              SkipUnchangedFiles="true" />
+    </Target>
+</Project>
