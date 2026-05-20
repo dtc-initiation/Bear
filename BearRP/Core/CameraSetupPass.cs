@@ -20,7 +20,6 @@ public class CameraSetupPass : IBearPass {
                 camInfo.x *= -1;
             }
 
-            passData.Camera = camera;
             passData.CameraInfo = camInfo;
             
             builder.AllowPassCulling(false);
