@@ -101,6 +101,7 @@ public class ShadowData {
                 
                 builder.AllowPassCulling(false);
                 builder.AllowGlobalStateModification(true);
+                builder.UseTexture(_smWideTH);
                 builder.SetRenderAttachmentDepth(_smTH, AccessFlags.Write);
                 builder.SetRenderFunc<ShadowMergeData>(ShadowMergePass);
             }
