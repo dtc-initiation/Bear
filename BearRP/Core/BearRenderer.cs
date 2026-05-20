@@ -1,4 +1,5 @@
 ﻿using System;
+using BearRP.DirectLighting;
 using BearRP.Features.IndirectLighting;
 using BearRP.GBuffer;
 using UnityEngine;
@@ -51,6 +52,11 @@ public class BearRenderer {
             new IndirectLightingRenderFeature(rcConfig, naiveConfig)
         };
     }
+
+    public void PassShadowData(LightData lightData, ShadowData shadowData) {
+        _context.PassShadowData(lightData, shadowData);
+    }
+    
     
     public void Render(RenderGraph renderGraph, ScriptableRenderContext unityContext, Camera camera) {
         unityContext.SetupCameraProperties(camera);
@@ -64,10 +70,10 @@ public class BearRenderer {
             renderGraph.BeginRecording(_context.RGParams);
             _context.CreateGBufferTextures(renderGraph);
             _context.CreateGITextures(renderGraph);
+            _context.CreateLightBuffer(renderGraph);
 
             _cameraSetupPass.Record(renderGraph, _context);
             _gBufferPass.Record(renderGraph, _context);
-
             foreach (RenderFeature feature in _renderFeatures) {
                 feature.ValidateFeature(renderGraph, _context);
                 feature.BeginFeature(renderGraph, _context);

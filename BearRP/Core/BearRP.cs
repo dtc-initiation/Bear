@@ -47,6 +47,7 @@ public class BearRP : RenderPipeline {
         ShadowData.UpdateShadowMesh();
         ShadowData.RecordShadowMapPass(_renderGraph, context, LightData);
         
+        _renderer.PassShadowData(LightData, ShadowData);
         foreach (Camera camera in cameras) {
             BeginCameraRendering(context, camera);
             _renderer.Render(_renderGraph, context, camera); 

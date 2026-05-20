@@ -17,12 +17,12 @@ public class ShadowData {
     // Initial Pass Texture and Material
     private Material _shadowMapMaterial;
     private RenderTexture _smWide;
-    private RTHandle _smWideTHInternal;
+    public RTHandle _smWideTHInternal;
     private TextureHandle _smWideTH;
 
     private RenderTexture _sm;
-    private RTHandle _smTHInternal;
-    public TextureHandle _smTH;
+    public RTHandle _smTHInternal;
+    private TextureHandle _smTH;
     
     // Empty MPB for instanced draw call
     private MaterialPropertyBlock _mpb;
@@ -100,7 +100,6 @@ public class ShadowData {
                 builder.SetRenderAttachmentDepth(_smTH, AccessFlags.Write);
                 builder.SetRenderFunc<ShadowMergeData>(ShadowMergePass);
             }
-            
             
             renderGraph.EndRecordingAndExecute();
             context.ExecuteCommandBuffer(rgParams.commandBuffer);
