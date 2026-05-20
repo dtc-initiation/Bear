@@ -30,6 +30,10 @@ public class ShadowData {
     public ShadowData(Material shadowMapMaterial, int maximumLightCount, int angularResolution) {
         _shadowMapMaterial = shadowMapMaterial;
         _openIds = new Stack<int>();
+        for (int lightCount = 0; lightCount < maximumLightCount; lightCount++) {
+            _openIds.Push(lightCount);
+        }
+        
         LightIdLookup = new Dictionary<Light, int>();
         _deadLights = new HashSet<Light>();
             
