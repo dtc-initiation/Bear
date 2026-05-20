@@ -20,6 +20,7 @@ public class BearRP : RenderPipeline {
     // Temporary for debug purposes only
     public static int SharedCullingLightCount = 0;
     public static Dictionary<Camera, int> CameraLightCount = new Dictionary<Camera, int>();
+    public static int MeshVertexSize = 0;
 
     public readonly LightData LightData;
     public readonly ShadowData ShadowData;
@@ -29,7 +30,7 @@ public class BearRP : RenderPipeline {
         _renderGraph = new RenderGraph();
         _renderer = new BearRenderer();
         LightData = new LightData(64);
-        ShadowData = new ShadowData(RPAsset.shadowMapMaterial, 64, 1024);
+        ShadowData = new ShadowData(RPAsset.shadowMapMaterial, 8, 1024);
     }
 
     protected override void Render(ScriptableRenderContext context, List<Camera> cameras) {

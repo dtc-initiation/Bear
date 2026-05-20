@@ -172,7 +172,6 @@ public class ShadowData {
     }
     
     private Mesh BuildShadowMesh(IReadOnlyList<EdgeCollider2D> colliders) {
-        float startingTime = Time.time;
         int totalEdges = 0;
         for (int j = 0; j < colliders.Count; j++) {
             totalEdges += colliders[j].edgeCount;
@@ -210,9 +209,7 @@ public class ShadowData {
         mesh.SetVertices(positions);
         mesh.SetUVs(0, partners);
         mesh.SetIndices(indices, MeshTopology.Lines, 0);
-        
-        float FinishedTime = Time.time;
-        // Debug.Log($"Time Taken : {FinishedTime - startingTime}");
+        Core.BearRP.MeshVertexSize = positions.Length;        
         return mesh;
     }
 

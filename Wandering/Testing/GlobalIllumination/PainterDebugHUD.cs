@@ -40,6 +40,8 @@ public class PainterDebugHUD : MonoBehaviour {
             }
         }
         
+        GUILayout.Label($"SM Vertex Size : {BearRP.Core.BearRP.MeshVertexSize}");
+        
         GUILayout.EndArea();
     }
 }
