@@ -6,7 +6,7 @@
         <LangVersion>14</LangVersion>
         <RootNamespace>BearRP</RootNamespace>
         <AssemblyName>BearRP</AssemblyName>
-        <UnityEditorPath>C:\Program Files\Unity\Hub\Editor\6000.3.10f1\Editor\Data</UnityEditorPath>
+        <UnityEditorPath>C:\Program Files\Unity\Hub\Editor\6000.4.7f1\Editor\Data</UnityEditorPath>
     </PropertyGroup>
     
     <ItemGroup>
@@ -26,7 +26,7 @@
     
     <Target Name="TestBuild" AfterTargets="Build">
         <Copy SourceFiles="$(OutputPath)$(AssemblyName).dll"
-              DestinationFolder="C:\0. UnityProjects\TestFrame\Assets\Plugins"
+              DestinationFolder="$(TargetProjectPath)\Assets\Plugins"
               SkipUnchangedFiles="true" />
     </Target>
 </Project>

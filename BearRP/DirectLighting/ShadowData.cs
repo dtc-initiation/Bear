@@ -16,10 +16,15 @@ public class ShadowData {
     // Textures and Handles
     // Initial Pass Texture and Material
     private Material _shadowMapMaterial;
-    private RenderTexture _shadowMap;
-    private RTHandle _shadowMapHandleInternal;
-    public TextureHandle _shadowMapHandle;
+    private RenderTexture _smWide;
+    private RTHandle _smWideTHInternal;
+    private TextureHandle _smWideTH;
+
+    private RenderTexture _sm;
+    private RTHandle _smTHInternal;
+    public TextureHandle _smTH;
     
+    // Empty MPB for instanced draw call
     private MaterialPropertyBlock _mpb;
     
     public ShadowData(Material shadowMapMaterial, int maximumLightCount, int angularResolution) {
@@ -27,15 +32,24 @@ public class ShadowData {
         _openIds = new Stack<int>();
         LightIdLookup = new Dictionary<Light, int>();
         _deadLights = new HashSet<Light>();
-        
-        _shadowMap = new RenderTexture(
+            
+        _smWide = new RenderTexture(
             (int)(angularResolution * 1.5f),
             maximumLightCount, 
             16,
             RenderTextureFormat.Depth
-            );
-        _shadowMap.Create();
-        _shadowMapHandleInternal = RTHandles.Alloc(_shadowMap);
+        );
+        _smWide.Create();
+        _smWideTHInternal = RTHandles.Alloc(_smWide);
+
+        _sm = new RenderTexture(
+            angularResolution,
+            maximumLightCount,
+            16,
+            RenderTextureFormat.Depth
+        );
+        _sm.Create();
+        _smTHInternal = RTHandles.Alloc(_smTH);
         
         _mpb = new MaterialPropertyBlock();
     }
@@ -52,13 +66,13 @@ public class ShadowData {
         };
         try {
             renderGraph.BeginRecording(rgParams);
-            var importParamters = new ImportResourceParams() {
+            var wideImportParams = new ImportResourceParams() {
                 clearOnFirstUse = true
-                // discardOnLastUse = true
             };
-            _shadowMapHandle = renderGraph.ImportTexture(_shadowMapHandleInternal, importParamters);
+            _smWideTH = renderGraph.ImportTexture(_smWideTHInternal, wideImportParams);
             
             using (var builder = renderGraph.AddRasterRenderPass<ShadowmapData>("Shadowmap Pass", out var passData)) {
+                passData.NumPass = 0;
                 passData.ShadowMesh = _blockerMesh;
                 passData.ShadowmapMaterial = _shadowMapMaterial;
                 passData.LightBuffer = lightData.LightBuffer;
@@ -67,9 +81,26 @@ public class ShadowData {
 
                 builder.AllowPassCulling(false);
                 builder.AllowGlobalStateModification(true);
-                builder.SetRenderAttachmentDepth(_shadowMapHandle, AccessFlags.Write);
+                builder.SetRenderAttachmentDepth(_smWideTH, AccessFlags.Write);
                 builder.SetRenderFunc<ShadowmapData>(ShadowmapPass);
             }
+
+            var importParams = new ImportResourceParams() {
+                clearOnFirstUse = true
+            };
+            _smTH = renderGraph.ImportTexture(_smTHInternal, importParams);
+
+            using (var builder = renderGraph.AddRasterRenderPass<ShadowMergeData>("Shadowmap Merge Pass", out var passData)) {
+                passData.NumPass = 1;
+                passData.ShadowMapMaterial = _shadowMapMaterial;
+                passData.WideHandle = _smWideTH;
+                
+                builder.AllowPassCulling(false);
+                builder.AllowGlobalStateModification(true);
+                builder.SetRenderAttachmentDepth(_smTH, AccessFlags.Write);
+                builder.SetRenderFunc<ShadowMergeData>(ShadowMergePass);
+            }
+            
             
             renderGraph.EndRecordingAndExecute();
             context.ExecuteCommandBuffer(rgParams.commandBuffer);
@@ -90,11 +121,11 @@ public class ShadowData {
         data.Mpb.SetBuffer(ShaderIDs.LightBuffer, data.LightBuffer);
         data.Mpb.SetFloat(ShaderIDs.LightCount, data.InstanceCount);
         
-        context.cmd.DrawMeshInstancedProcedural(data.ShadowMesh, 0, data.ShadowmapMaterial, 0, data.InstanceCount, data.Mpb);
+        context.cmd.DrawMeshInstancedProcedural(data.ShadowMesh, 0, data.ShadowmapMaterial, data.NumPass, data.InstanceCount, data.Mpb);
     }
 
     private static void ShadowMergePass(ShadowMergeData data, RasterGraphContext context) {
-        Blitter.BlitTexture(context.cmd, data.ShadowMapHandle, new Vector4(1, 1, 0, 0), data.ShadowMapMaterial, 1);
+        Blitter.BlitTexture(context.cmd, data.WideHandle, new Vector4(1, 1, 0, 0), data.ShadowMapMaterial, data.NumPass);
     }
 
     public void AssignLightIds(HashSet<Light> visibleLights) {
@@ -136,7 +167,7 @@ public class ShadowData {
     }
     
     public void UpdateShadowMesh() {
-        var blockers = GameObject.FindObjectsByType<EdgeCollider2D>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+        var blockers = GameObject.FindObjectsByType<EdgeCollider2D>(FindObjectsInactive.Exclude);
         _blockerMesh = BuildShadowMesh(blockers);
     }
     
@@ -186,7 +217,7 @@ public class ShadowData {
     }
 
     public void Dispose() {
-        _shadowMapHandleInternal.Release();
+        _smWideTHInternal.Release();
+        _smTHInternal.Release();
     }
-
 }

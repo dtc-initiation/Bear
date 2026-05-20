@@ -33,14 +33,14 @@ public class BearRP : RenderPipeline {
         SetupAndCull(context, cameras);
 
         // Setup lighting Data 
-        // LightData.RegisterVisibleLights(SharedCullingResults, cameras);
-        // ShadowData.ReleaseDeadLights();
-        // ShadowData.AssignLightIds(LightData.VisibleLights);
-        // LightData.PopulateLight(ShadowData.LightIdLookup);
+        LightData.RegisterVisibleLights(SharedCullingResults, cameras);
+        ShadowData.ReleaseDeadLights();
+        ShadowData.AssignLightIds(LightData.VisibleLights);
+        LightData.PopulateLight(ShadowData.LightIdLookup);
         
         // Draw onto shadowmap
-        // ShadowData.UpdateShadowMesh();
-        // ShadowData.RecordShadowMapPass(_renderGraph, context, LightData);
+        ShadowData.UpdateShadowMesh();
+        ShadowData.RecordShadowMapPass(_renderGraph, context, LightData);
         
         foreach (Camera camera in cameras) {
             BeginCameraRendering(context, camera);
