@@ -13,13 +13,20 @@ namespace BearRP.Core;
 public class BearRenderer {
     private BearRPContext _context;
     private CameraSetupPass _cameraSetupPass;
+    private DeferredLightingPass _deferredLightingPass;
     private GBufferPass _gBufferPass;
+    
     private RenderFeature[] _renderFeatures;
     
     public BearRenderer() {
         _context = new BearRPContext();
         _cameraSetupPass = new CameraSetupPass();
+        var deferredConfig = new DeferredLightingConfig(
+            BearRP.RPAsset.deferredMaterial
+        );
+        _deferredLightingPass = new DeferredLightingPass(deferredConfig);
         _gBufferPass = new GBufferPass();
+        
         
         SetupRenderFeatures();
     }

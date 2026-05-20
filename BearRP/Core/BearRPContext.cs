@@ -18,7 +18,7 @@ public class BearRPContext {
     public CameraData CameraData = null!;
     public CommandBuffer CommandBuffer = null!;
 
-    public ComputeBuffer? LightBuffer;
+    public ComputeBuffer? LightData;
     public RTHandle? ShadowMap;
     
     public ScriptableRenderContext UnityContext;
@@ -27,7 +27,7 @@ public class BearRPContext {
     public GBufferTextures GBufferTextures;
 
     public void PassShadowData(LightData lightData, ShadowData shadowData) {
-        LightBuffer = lightData.LightBuffer;
+        LightData = lightData.LightBuffer;
         ShadowMap = shadowData._smTHInternal;
     }
     

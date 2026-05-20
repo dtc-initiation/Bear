@@ -16,6 +16,7 @@ public class BearRPAsset : RenderPipelineAsset<BearRP> {
 
     [Header("Direct Lighting Settings")]
     [SerializeField] public Material shadowMapMaterial = null!;
+    [SerializeField] public Material deferredMaterial = null!;
     
     [Header("Global Illumination Settings")]
     [SerializeField] public GIGatherMethod gatherMethod = GIGatherMethod.Naive;
