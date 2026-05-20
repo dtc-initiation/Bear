@@ -16,8 +16,11 @@ public class BearRPContext {
     public BearCamera BearCamera = null!;
     public CameraData CameraData = null!;
     public CommandBuffer CommandBuffer = null!;
-    public ScriptableRenderContext UnityContext;
 
+    public ComputeBuffer LightBuffer;
+    
+    public ScriptableRenderContext UnityContext;
+    public DirectIlluminationTextures DiTextures;
     public GlobalIlluminationTextures GiTextures;  
     public GBufferTextures GBufferTextures;
 
@@ -38,13 +41,27 @@ public class BearRPContext {
             currentFrameIndex = Time.frameCount
         };
     }
+
+    public void CreateLightBuffer(RenderGraph renderGraph) {
+        // Again
+        
+        
+        var lightBufferDesc = new TextureDesc(BearCamera.GetPixelWidth(), BearCamera.GetPixelHeight()) {
+            name = "LightBuffer",
+            clearBuffer = true,
+            clearColor = Color.black,
+            colorFormat = GraphicsFormat.R16G16B16A16_UNorm,
+            filterMode = FilterMode.Point
+        };
+        DiTextures.LightBuffer = renderGraph.CreateTexture(lightBufferDesc);
+    }
     
     public void CreateGBufferTextures(RenderGraph renderGraph) {
         var albedoDesc = new TextureDesc(BearCamera.GetPixelWidth(), BearCamera.GetPixelHeight()) {
             name = "GBuffer_Albedo",
             clearBuffer = true,
             clearColor = Color.black,
-            colorFormat = GraphicsFormat.R8G8B8A8_UNorm,
+            colorFormat = GraphicsFormat.R16G16B16A16_UNorm,
             filterMode = FilterMode.Point
         };
         GBufferTextures.Albedo = renderGraph.CreateTexture(albedoDesc);
@@ -53,7 +70,7 @@ public class BearRPContext {
             name = "GBuffer_Normal",
             clearBuffer = true,
             clearColor = new Color(0.5f, 0.5f, 1f, 1f),
-            colorFormat = GraphicsFormat.R8G8B8A8_UNorm,
+            colorFormat = GraphicsFormat.R16G16B16A16_UNorm,
             filterMode = FilterMode.Point
         };
         GBufferTextures.Normal = renderGraph.CreateTexture(normalDesc);

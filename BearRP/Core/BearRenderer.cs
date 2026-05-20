@@ -12,11 +12,13 @@ namespace BearRP.Core;
 public class BearRenderer {
     private BearRPContext _context;
     private CameraSetupPass _cameraSetupPass;
+    private GBufferPass _gBufferPass;
     private RenderFeature[] _renderFeatures;
     
     public BearRenderer() {
         _context = new BearRPContext();
         _cameraSetupPass = new CameraSetupPass();
+        _gBufferPass = new GBufferPass();
         
         SetupRenderFeatures();
     }
@@ -63,28 +65,16 @@ public class BearRenderer {
             _context.CreateGBufferTextures(renderGraph);
             _context.CreateGITextures(renderGraph);
 
-            bool gBufferSuccess = false;
-            bool debugBlitSucces = false;
-
             _cameraSetupPass.Record(renderGraph, _context);
+            _gBufferPass.Record(renderGraph, _context);
 
-            gBufferSuccess = AddGBufferPass(renderGraph, camera);
-
-            if (gBufferSuccess) {
-                foreach (RenderFeature feature in _renderFeatures) {
-                    feature.ValidateFeature(renderGraph, _context);
-                    feature.BeginFeature(renderGraph, _context);
-                    feature.Record(renderGraph, _context);
-                }
+            foreach (RenderFeature feature in _renderFeatures) {
+                feature.ValidateFeature(renderGraph, _context);
+                feature.BeginFeature(renderGraph, _context);
+                feature.Record(renderGraph, _context);
             }
 
-            if (gBufferSuccess) {
-                debugBlitSucces = AddDebugBlitPass(renderGraph, _context.GBufferTextures);
-            }
-
-            if (debugBlitSucces) {
-
-            }
+            AddDebugBlitPass(renderGraph, _context.GBufferTextures);
 
             renderGraph.EndRecordingAndExecute();
             unityContext.ExecuteCommandBuffer(_context.CommandBuffer);
