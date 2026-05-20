@@ -134,17 +134,12 @@ public class Painter : MonoBehaviour {
         // paintMaterial.SetVector("_From", _prevPosition);
         // paintMaterial.SetVector("_To", _currentPosition);
 
-        PainterDebugHUD.UpdateMaterialCalls++;
-        PainterDebugHUD.BlitCalls += 2;
-        
         Graphics.Blit(targetTexture, _tempRT, paintMaterial);
         Graphics.Blit(_tempRT, targetTexture);
         _prevPosition = _currentPosition;
     }
     
     private void FinishPaint() {
-        PainterDebugHUD.FinishPaintCalls++;
-        
         if (!_isDrawing) { return; }
         _isDrawing = false;
         paintMaterial.SetFloat("_IsDrawing", 0.0f);

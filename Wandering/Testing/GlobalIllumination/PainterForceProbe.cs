@@ -67,7 +67,6 @@ public class PainterForceProbe : MonoBehaviour {
 
         if (kb.f8Key.wasPressedThisFrame && testPattern != null) {
             Graphics.Blit(testPattern, target);
-            PainterDebugHUD.LastNote = $"F8: test pattern blit → target at f{Time.frameCount}";
         }
 
         if (kb.f7Key.wasPressedThisFrame && paintMaterial != null && _probeTemp != null) {
@@ -79,7 +78,6 @@ public class PainterForceProbe : MonoBehaviour {
             paintMaterial.SetVector("_BlitScaleBias", new Vector4(1, 1, 0, 0));
             Graphics.Blit(target, _probeTemp, paintMaterial);
             Graphics.Blit(_probeTemp, target);
-            PainterDebugHUD.LastNote = $"F7: forced blit pair at f{Time.frameCount}";
         }
 
         if (kb.f9Key.wasPressedThisFrame && paintMaterial != null) {
@@ -88,7 +86,6 @@ public class PainterForceProbe : MonoBehaviour {
             GL.Clear(true, true, new Color(0.0f, 0.0f, 0.0f, 0f));
             paintMaterial.SetVector("_BlitScaleBias", new Vector4(1, 1, 0, 0));
             RenderTexture.active = active;
-            PainterDebugHUD.LastNote = $"F9: GL.Clear → target at f{Time.frameCount}";
         }
     }
 }

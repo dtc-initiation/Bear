@@ -6,7 +6,8 @@
         <LangVersion>14</LangVersion>
         <RootNamespace>BearRP</RootNamespace>
         <AssemblyName>BearRP</AssemblyName>
-        <UnityEditorPath>C:\Program Files\Unity\Hub\Editor\6000.4.7f1\Editor\Data</UnityEditorPath>
+        <UnityEditorPath>C:\Program Files\Unity\Hub\Editor\6000.3.10f1\Editor\Data</UnityEditorPath>
+        <TargetProjectPath>C:\0.UnityProjects\TestFrame</TargetProjectPath>
     </PropertyGroup>
     
     <ItemGroup>

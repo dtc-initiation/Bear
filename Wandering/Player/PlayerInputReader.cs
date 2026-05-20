@@ -22,14 +22,11 @@ public class PlayerInputReader : ScriptableObject, PlayerInputActions.IPlayerAct
 
     public void OnPoint(InputAction.CallbackContext context) {
         MousePosition = context.ReadValue<Vector2>();
-        PainterDebugHUD.MoveEvents++;
         PainterDebugHUD.LastRawMouse = MousePosition;
         MouseMoved.Invoke(MousePosition);
     } 
 
     public void OnClick(InputAction.CallbackContext context) {
-        PainterDebugHUD.ClickEvents++;
-        
         switch (context.phase) {
             case InputActionPhase.Started:
                 ClickPressed.Invoke(true);

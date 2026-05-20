@@ -34,6 +34,9 @@ public static class CameraExtensions {
         CameraData data = GetOrAddCameraData(camera);
         if (camera.TryGetCullingParameters(camera, out ScriptableCullingParameters cullingParams)) {
             data.CullingResults = context.Cull(ref cullingParams);
+            
+            // Debug purpose only
+            Core.BearRP.CameraLightCount.Add(camera, data.CullingResults.visibleLights.Length);
         };
     }
 }

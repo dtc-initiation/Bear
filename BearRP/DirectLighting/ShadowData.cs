@@ -49,7 +49,7 @@ public class ShadowData {
             RenderTextureFormat.Depth
         );
         _sm.Create();
-        _smTHInternal = RTHandles.Alloc(_smTH);
+        _smTHInternal = RTHandles.Alloc(_sm);
         
         _mpb = new MaterialPropertyBlock();
     }
@@ -167,7 +167,7 @@ public class ShadowData {
     }
     
     public void UpdateShadowMesh() {
-        var blockers = GameObject.FindObjectsByType<EdgeCollider2D>(FindObjectsInactive.Exclude);
+        var blockers = GameObject.FindObjectsByType<EdgeCollider2D>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
         _blockerMesh = BuildShadowMesh(blockers);
     }
     

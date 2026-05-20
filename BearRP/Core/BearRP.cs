@@ -16,6 +16,10 @@ public class BearRP : RenderPipeline {
     public static Dictionary<Light, BearLight> BearLightLookup = new Dictionary<Light, BearLight>();
     public static Dictionary<Camera, BearCamera> BearCameraLookup = new Dictionary<Camera, BearCamera>();
     public static Dictionary<Camera, CameraData> CameraDataLookup = new Dictionary<Camera, CameraData>();
+    
+    // Temporary for debug purposes only
+    public static int SharedCullingLightCount = 0;
+    public static Dictionary<Camera, int> CameraLightCount = new Dictionary<Camera, int>();
 
     public readonly LightData LightData;
     public readonly ShadowData ShadowData;
@@ -52,6 +56,10 @@ public class BearRP : RenderPipeline {
 
     private void BeginFrame() {
         SharedCullingResults = null;
+        
+        // Debug Purposes only
+        SharedCullingLightCount = 0;
+        CameraLightCount.Clear();
     }
 
     private void SetupAndCull(ScriptableRenderContext context, List<Camera> cameras) {
@@ -60,6 +68,9 @@ public class BearRP : RenderPipeline {
         if (shareCull) {
             if (Camera.main.TryGetCullingParameters(out ScriptableCullingParameters cullingParams)) {
                 SharedCullingResults = context.Cull(ref cullingParams);
+                
+                // Debug Purposes only
+                SharedCullingLightCount = SharedCullingResults.Value.visibleLights.Length;
             }
         }
 
@@ -79,5 +90,8 @@ public class BearRP : RenderPipeline {
 
         ShadowData.Dispose();
         LightData.Dispose();
+        
+        // Debug purposes only
+        CameraLightCount.Clear();
     }
 }
