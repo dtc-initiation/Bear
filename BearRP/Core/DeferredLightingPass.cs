@@ -9,9 +9,11 @@ namespace BearRP.Core;
 public class DeferredLightingPass : IBearPass {
     private MaterialPropertyBlock _mpb = new ();
     private DeferredLightingConfig _config;
+    private readonly Mesh _quad;
     
     public DeferredLightingPass(DeferredLightingConfig config) {
         _config = config;
+        _quad = BearRPUtils.CreateQuad();
     }
     
     public void Record(RenderGraph renderGraph, BearRPContext context) {
@@ -19,7 +21,7 @@ public class DeferredLightingPass : IBearPass {
             return;
         }
         using (var builder = renderGraph.AddRasterRenderPass<DeferredLightingData>("Deferred Lighting Pass", out var passData)) {
-            passData.BaseQuad = BearRPUtils.Quad;
+            passData.BaseQuad = _quad;
             passData.DeferredLightMaterial = _config.DeferredLightingMaterial;
             passData.Mpb = _mpb;
             passData.LightData = context.LightData.LightBuffer;
