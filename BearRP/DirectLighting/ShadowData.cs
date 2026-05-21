@@ -29,6 +29,11 @@ public class ShadowData {
     
     public ShadowData(Material shadowMapMaterial, int maximumLightCount, int angularResolution) {
         _shadowMapMaterial = shadowMapMaterial;
+        _blockerMesh = new Mesh {
+            name = "ShadowCasters",
+            indexFormat = IndexFormat.UInt16,
+        };
+        
         _openIds = new Stack<int>();
         for (int lightCount = 0; lightCount < maximumLightCount; lightCount++) {
             _openIds.Push(lightCount);
@@ -205,16 +210,12 @@ public class ShadowData {
                 vertexIdx += 2;
             }
         }
-
-        var mesh = new Mesh {
-            name = "ShadowCasters",
-            indexFormat = IndexFormat.UInt16,
-        };
-        mesh.SetVertices(positions);
-        mesh.SetUVs(0, partners);
-        mesh.SetIndices(indices, MeshTopology.Lines, 0);
+        _blockerMesh.Clear();
+        _blockerMesh.SetVertices(positions);
+        _blockerMesh.SetUVs(0, partners);
+        _blockerMesh.SetIndices(indices, MeshTopology.Lines, 0);
         Core.BearRP.MeshVertexSize = positions.Length;        
-        return mesh;
+        return _blockerMesh;
     }
 
     public void Dispose() {
