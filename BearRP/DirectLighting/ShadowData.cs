@@ -46,9 +46,9 @@ public class ShadowData {
             
         _smWide = new RenderTexture(
             (int)(angularResolution * 1.5f),
-            MaxLightCount, 
-            16,
-            RenderTextureFormat.Depth
+            MaxLightCount,
+            0, 
+            RenderTextureFormat.RFloat
         );
         _smWide.Create();
         _smWideTHInternal = RTHandles.Alloc(_smWide);
@@ -56,8 +56,8 @@ public class ShadowData {
         _sm = new RenderTexture(
             angularResolution,
             MaxLightCount,
-            16,
-            RenderTextureFormat.Depth
+            0,
+            RenderTextureFormat.RFloat
         );
         _sm.Create();
         _smTHInternal = RTHandles.Alloc(_sm);
@@ -78,7 +78,8 @@ public class ShadowData {
         try {
             renderGraph.BeginRecording(rgParams);
             var wideImportParams = new ImportResourceParams() {
-                clearOnFirstUse = true
+                clearOnFirstUse = true,
+                clearColor = Color.white
             };
             _smWideTH = renderGraph.ImportTexture(_smWideTHInternal, wideImportParams);
             
@@ -93,12 +94,13 @@ public class ShadowData {
 
                 builder.AllowPassCulling(false);
                 builder.AllowGlobalStateModification(true);
-                builder.SetRenderAttachmentDepth(_smWideTH, AccessFlags.Write);
+                builder.SetRenderAttachment(_smWideTH, 0, AccessFlags.Write);
                 builder.SetRenderFunc<ShadowmapData>(ShadowmapPass);
             }
 
             var importParams = new ImportResourceParams() {
-                clearOnFirstUse = true
+                clearOnFirstUse = true,
+                clearColor = Color.white
             };
             _smTH = renderGraph.ImportTexture(_smTHInternal, importParams);
 
@@ -110,7 +112,7 @@ public class ShadowData {
                 builder.AllowPassCulling(false);
                 builder.AllowGlobalStateModification(true);
                 builder.UseTexture(_smWideTH);
-                builder.SetRenderAttachmentDepth(_smTH, AccessFlags.Write);
+                builder.SetRenderAttachment(_smTH, 0, AccessFlags.Write);
                 builder.SetRenderFunc<ShadowMergeData>(ShadowMergePass);
             }
             

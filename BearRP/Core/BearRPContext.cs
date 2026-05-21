@@ -51,7 +51,7 @@ public class BearRPContext {
     public void CreateLightBuffer(RenderGraph renderGraph) {
         var shadowMapDesc = new ImportResourceParams() {
             clearOnFirstUse = false,
-            discardOnLastUse = true
+            discardOnLastUse = false
         };
         DiTextures.ShadowMap = renderGraph.ImportTexture(ShadowData._smTHInternal, shadowMapDesc);
         
