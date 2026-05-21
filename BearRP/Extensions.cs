@@ -52,6 +52,7 @@ public static class LightExtensions {
         if (!exists) {
             bearLight = light.gameObject.AddComponent<BearLight>();
         }
+        bearLight.Light = light;
         Core.BearRP.BearLightLookup.Add(light, bearLight);
         return bearLight;
     }
