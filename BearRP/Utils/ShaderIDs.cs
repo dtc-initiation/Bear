@@ -11,6 +11,7 @@ public static class ShaderIDs {
     public static readonly int Epsilon = GetID("_Epsilon");
     
     // Direct Lighting related
+    public static readonly int MaxLightCount = GetID("_MaxLightCount");
     public static readonly int LightBuffer = GetID("_LightBuffer");
     public static readonly int LightCount = GetID("_LightCount");
     

@@ -88,6 +88,7 @@ public class ShadowData {
                 passData.ShadowmapMaterial = _shadowMapMaterial;
                 passData.LightBuffer = lightData.LightBuffer;
                 passData.InstanceCount = lightData.VisibleLights.Count;
+                passData.MaxLightCount = _maxLightCount;
                 passData.Mpb = _mpb;
 
                 builder.AllowPassCulling(false);
@@ -131,6 +132,7 @@ public class ShadowData {
         context.cmd.SetGlobalFloat(ShaderIDs.Pi, Mathf.PI);
         data.Mpb.SetBuffer(ShaderIDs.LightBuffer, data.LightBuffer);
         data.Mpb.SetFloat(ShaderIDs.LightCount, data.InstanceCount);
+        data.Mpb.SetFloat(ShaderIDs.MaxLightCount, data.MaxLightCount);
         
         context.cmd.DrawMeshInstancedProcedural(data.ShadowMesh, 0, data.ShadowmapMaterial, data.NumPass, data.InstanceCount, data.Mpb);
     }
