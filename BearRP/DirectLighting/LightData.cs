@@ -41,21 +41,21 @@ public class LightData {
     }
     
     public void PopulateLight(Dictionary<Light, int> lightIdLookup) {
-        foreach (Light light in VisibleLights) {
-            if (!lightIdLookup.TryGetValue(light, out var id)) {
-                continue;
-            }
-            
+        // TODO Robust Dense instanceID to Sparse LightId mismatch fix.
+        int denseIdx = 0;
+        foreach (Light light in VisibleLights) { ;
+            var id = lightIdLookup.GetValueOrDefault(light, -1);
             BearLight bearLight = light.TryGetBearLight();
 
             var p = bearLight.transform.position;
             var color = bearLight.Intensity * bearLight.Color;
 
-            _lightInfoScratch[id] = new LightInfo(
+            _lightInfoScratch[denseIdx] = new LightInfo(
                 new Vector4(p.x, p.y, p.z, id),
                 new Vector4(color.r, color.g, color.b, bearLight.Distance),
                 new Vector4(bearLight.ForwardDir.x, bearLight.ForwardDir.y, bearLight.ConeAngleSize, 1)
             );
+            denseIdx++;
         }
         LightBuffer.SetData(_lightInfoScratch);
     }
