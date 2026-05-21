@@ -43,7 +43,7 @@ public class LightData {
     public void PopulateLight(Dictionary<Light, int> lightIdLookup) {
         // TODO Robust Dense instanceID to Sparse LightId mismatch fix.
         int denseIdx = 0;
-        foreach (Light light in VisibleLights) { ;
+        foreach (Light light in VisibleLights) {
             var id = lightIdLookup.GetValueOrDefault(light, -1);
             BearLight bearLight = light.TryGetBearLight();
 

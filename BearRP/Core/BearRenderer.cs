@@ -81,6 +81,7 @@ public class BearRenderer {
 
             _cameraSetupPass.Record(renderGraph, _context);
             _gBufferPass.Record(renderGraph, _context);
+            _deferredLightingPass.Record(renderGraph, _context);
             foreach (RenderFeature feature in _renderFeatures) {
                 feature.ValidateFeature(renderGraph, _context);
                 feature.BeginFeature(renderGraph, _context);
@@ -153,6 +154,9 @@ public class BearRenderer {
                 break;
             case (DebugOutputMode.Depth):
                 outputValue = gBuffer.Depth;
+                break;
+            case (DebugOutputMode.DirectLighting):
+                outputValue = _context.DiTextures.LightBuffer;
                 break;
             case (DebugOutputMode.Emissive):
                 outputValue = _context.GiTextures.OutputTexture.IsValid() ? _context.GiTextures.OutputTexture : gBuffer.Albedo;

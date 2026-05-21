@@ -9,6 +9,7 @@ public class DeferredLightingData {
     public MaterialPropertyBlock Mpb = null!;
     public ComputeBuffer? LightData = null!;
     public int InstanceCount;
+    public int MaxLightCount;
     public TextureHandle Shadowmap;
     public TextureHandle LightBuffer;
 }

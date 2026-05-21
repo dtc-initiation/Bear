@@ -18,8 +18,8 @@ public class BearRPContext {
     public CameraData CameraData = null!;
     public CommandBuffer CommandBuffer = null!;
 
-    public ComputeBuffer? LightData;
-    public RTHandle? ShadowMap;
+    public LightData LightData;
+    public ShadowData ShadowData;
     
     public ScriptableRenderContext UnityContext;
     public DirectIlluminationTextures DiTextures;
@@ -27,8 +27,8 @@ public class BearRPContext {
     public GBufferTextures GBufferTextures;
 
     public void PassShadowData(LightData lightData, ShadowData shadowData) {
-        LightData = lightData.LightBuffer;
-        ShadowMap = shadowData._smTHInternal;
+        LightData = lightData;
+        ShadowData = shadowData;
     }
     
     public void Setup(ScriptableRenderContext unityContext, Camera camera) {
@@ -53,7 +53,7 @@ public class BearRPContext {
             clearOnFirstUse = false,
             discardOnLastUse = true
         };
-        DiTextures.ShadowMap = renderGraph.ImportTexture(ShadowMap, shadowMapDesc);
+        DiTextures.ShadowMap = renderGraph.ImportTexture(ShadowData._smTHInternal, shadowMapDesc);
         
         
         var lightBufferDesc = new TextureDesc(BearCamera.GetPixelWidth(), BearCamera.GetPixelHeight()) {

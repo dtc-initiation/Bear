@@ -14,6 +14,7 @@ public static class ShaderIDs {
     public static readonly int MaxLightCount = GetID("_MaxLightCount");
     public static readonly int LightBuffer = GetID("_LightBuffer");
     public static readonly int LightCount = GetID("_LightCount");
+    public static readonly int ShadowMap = GetID("_ShadowMap");
     
     // GI Related
     public static readonly int Emission = GetID("_Emission");

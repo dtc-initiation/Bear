@@ -11,7 +11,7 @@ public class ShadowData {
     private readonly Stack<int> _openIds;
     public readonly Dictionary<Light, int> LightIdLookup;
     private readonly HashSet<KeyValuePair<Light, int>> _deadPair;
-    private readonly int _maxLightCount;
+    public readonly int MaxLightCount;
     private Mesh _blockerMesh;
     
     // Textures and Handles
@@ -29,7 +29,7 @@ public class ShadowData {
     private MaterialPropertyBlock _mpb;
     
     public ShadowData(Material shadowMapMaterial, int maxLightCount, int angularResolution) {
-        _maxLightCount = maxLightCount;
+        MaxLightCount = maxLightCount;
         _shadowMapMaterial = shadowMapMaterial;
         _blockerMesh = new Mesh {
             name = "ShadowCasters",
@@ -37,7 +37,7 @@ public class ShadowData {
         };
         
         _openIds = new Stack<int>();
-        for (int lightCount = _maxLightCount - 1; lightCount >= 0; lightCount--) {
+        for (int lightCount = MaxLightCount - 1; lightCount >= 0; lightCount--) {
             _openIds.Push(lightCount);
         }
         
@@ -46,7 +46,7 @@ public class ShadowData {
             
         _smWide = new RenderTexture(
             (int)(angularResolution * 1.5f),
-            _maxLightCount, 
+            MaxLightCount, 
             16,
             RenderTextureFormat.Depth
         );
@@ -55,7 +55,7 @@ public class ShadowData {
 
         _sm = new RenderTexture(
             angularResolution,
-            _maxLightCount,
+            MaxLightCount,
             16,
             RenderTextureFormat.Depth
         );
@@ -88,7 +88,7 @@ public class ShadowData {
                 passData.ShadowmapMaterial = _shadowMapMaterial;
                 passData.LightBuffer = lightData.LightBuffer;
                 passData.InstanceCount = lightData.VisibleLights.Count;
-                passData.MaxLightCount = _maxLightCount;
+                passData.MaxLightCount = MaxLightCount;
                 passData.Mpb = _mpb;
 
                 builder.AllowPassCulling(false);
