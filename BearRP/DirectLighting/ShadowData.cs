@@ -10,7 +10,8 @@ namespace BearRP.DirectLighting;
 public class ShadowData {
     private readonly Stack<int> _openIds;
     public readonly Dictionary<Light, int> LightIdLookup;
-    private readonly HashSet<Light> _deadLights;
+    private readonly HashSet<KeyValuePair<Light, int>> _deadPair;
+    private readonly int _maxLightCount;
     private Mesh _blockerMesh;
     
     // Textures and Handles
@@ -27,7 +28,8 @@ public class ShadowData {
     // Empty MPB for instanced draw call
     private MaterialPropertyBlock _mpb;
     
-    public ShadowData(Material shadowMapMaterial, int maximumLightCount, int angularResolution) {
+    public ShadowData(Material shadowMapMaterial, int maxLightCount, int angularResolution) {
+        _maxLightCount = maxLightCount;
         _shadowMapMaterial = shadowMapMaterial;
         _blockerMesh = new Mesh {
             name = "ShadowCasters",
@@ -35,16 +37,16 @@ public class ShadowData {
         };
         
         _openIds = new Stack<int>();
-        for (int lightCount = 0; lightCount < maximumLightCount; lightCount++) {
+        for (int lightCount = _maxLightCount - 1; lightCount >= 0; lightCount--) {
             _openIds.Push(lightCount);
         }
         
         LightIdLookup = new Dictionary<Light, int>();
-        _deadLights = new HashSet<Light>();
+        _deadPair = new ();
             
         _smWide = new RenderTexture(
             (int)(angularResolution * 1.5f),
-            maximumLightCount, 
+            _maxLightCount, 
             16,
             RenderTextureFormat.Depth
         );
@@ -53,7 +55,7 @@ public class ShadowData {
 
         _sm = new RenderTexture(
             angularResolution,
-            maximumLightCount,
+            _maxLightCount,
             16,
             RenderTextureFormat.Depth
         );
@@ -164,15 +166,15 @@ public class ShadowData {
     public void ReleaseDeadLights() {
         foreach (var kvp in LightIdLookup) {
             if (kvp.Key == null || kvp.Key.Equals(null) || !kvp.Key.isActiveAndEnabled) {
-                _deadLights.Add(kvp.Key);
+                _deadPair.Add(kvp);
             }
         }
 
-        foreach (Light deadLight in _deadLights) {
-            _openIds.Push(LightIdLookup[deadLight]);
-            LightIdLookup.Remove(deadLight);
+        foreach (var pair in _deadPair) {
+            _openIds.Push(pair.Value);
+            LightIdLookup.Remove(pair.Key);
         }
-        _deadLights.Clear();
+        _deadPair.Clear();
     }
     
     public void UpdateShadowMesh() {
