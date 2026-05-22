@@ -106,13 +106,13 @@ public class BearRPContext {
     private RTHandle? _debugEmissiveTextureHandle;
     
     public void CreateGITextures(RenderGraph renderGraph) {
-        // TODO InputTexture will be Emission from GBuffer
-        RenderTexture externalRT = BearRP.RPAsset.DebugEmissiveInput;
-        if (_debugEmissiveTextureHandle == null) {
-            _debugEmissiveTextureHandle?.Release();
-            _debugEmissiveTextureHandle = RTHandles.Alloc(externalRT);
-        }
-        GiTextures.InputTexture = renderGraph.ImportTexture(_debugEmissiveTextureHandle);
+        GiTextures.InputTexture = GBufferTextures.Emission;
+        // RenderTexture externalRT = BearRP.RPAsset.DebugEmissiveInput;
+        // if (_debugEmissiveTextureHandle == null) {
+        //     _debugEmissiveTextureHandle?.Release();
+        //     _debugEmissiveTextureHandle = RTHandles.Alloc(externalRT);
+        // }
+        // GiTextures.InputTexture = renderGraph.ImportTexture(_debugEmissiveTextureHandle);
 
         TextureDesc outputDesc = new TextureDesc(BearCamera.GetPixelWidth(), BearCamera.GetPixelHeight()) {
             name = "Gi Output",

@@ -9,8 +9,6 @@ public class GBufferPass : IBearPass {
     public void Record(RenderGraph renderGraph, BearRPContext context) {
         AddGBufferPass(renderGraph, context);
     }
-    // TODO Create emission textures
-    // Create Normal Textures
 
     private void AddGBufferPass(RenderGraph renderGraph, BearRPContext context) {
         using (var builder = renderGraph.AddRasterRenderPass<GBufferData>("GBuffer", out var passData)) {
@@ -35,7 +33,6 @@ public class GBufferPass : IBearPass {
             builder.SetRenderFunc<GBufferData>(GBufferPassInternal);
         }
     }
-    
     
     private void GBufferPassInternal(GBufferData data, RasterGraphContext context) {
         context.cmd.DrawRendererList(data.RendererList);
