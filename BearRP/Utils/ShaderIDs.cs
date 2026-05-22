@@ -42,6 +42,11 @@ public static class ShaderIDs {
     public static readonly int SunAngle = GetID("_SunAngle");
     public static readonly int SunAngularRadius = GetID("_SunAngularRadius");
     public static readonly int SunIntensity = GetID("_SunIntensity");
+    
+    // Composite Related
+    public static readonly int DirectLighting = GetID("_DirectLighting");
+    public static readonly int IndirectLighting = GetID("_IndirectLighting");
+    
     private static int GetID(string shaderVariable) {
         return Shader.PropertyToID(shaderVariable);
     }
