@@ -21,10 +21,7 @@ public class BearRenderer {
     public BearRenderer() {
         _context = new BearRPContext();
         _cameraSetupPass = new CameraSetupPass();
-        var deferredConfig = new DeferredLightingConfig(
-            BearRP.RPAsset.deferredMaterial
-        );
-        _deferredLightingPass = new DeferredLightingPass(deferredConfig);
+        _deferredLightingPass = new DeferredLightingPass();
         _gBufferPass = new GBufferPass();
         
         
@@ -34,8 +31,6 @@ public class BearRenderer {
     private void SetupRenderFeatures() {
         // Indirect Lighting Render Feature
         var rcConfig = new RcGiConfig(
-            BearRP.RPAsset.distanceFieldMaterial,
-            BearRP.RPAsset.radianceCascadeMaterial,
             BearRP.RPAsset.numberOfCascades,
             BearRP.RPAsset.cascade0RayCount,
             BearRP.RPAsset.cascade0ProbeDensity,
@@ -49,8 +44,6 @@ public class BearRenderer {
         );
         
         var naiveConfig = new NaiveGiConfig(
-            BearRP.RPAsset.DistanceFieldMaterial,
-            BearRP.RPAsset.NaiveMaterial,
             BearRP.RPAsset.naiveGIRayCount,
             BearRP.RPAsset.naiveMaxSteps
         );

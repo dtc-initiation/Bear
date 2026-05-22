@@ -28,9 +28,8 @@ public class ShadowData {
     // Empty MPB for instanced draw call
     private MaterialPropertyBlock _mpb;
     
-    public ShadowData(Material shadowMapMaterial, int maxLightCount, int angularResolution) {
+    public ShadowData(int maxLightCount, int angularResolution) {
         MaxLightCount = maxLightCount;
-        _shadowMapMaterial = shadowMapMaterial;
         _blockerMesh = new Mesh {
             name = "ShadowCasters",
             indexFormat = IndexFormat.UInt16,
@@ -66,6 +65,7 @@ public class ShadowData {
     }
 
     public void RecordShadowMapPass(RenderGraph renderGraph, ScriptableRenderContext context, LightData lightData) {
+        BearRPUtils.GetOrLoadMaterial(ref _shadowMapMaterial, "Bear/Shadowmap");
         if (lightData.VisibleLights.Count == 0) {
             return;
         }

@@ -4,8 +4,6 @@ using UnityEngine;
 namespace BearRP.Features.IndirectLighting;
 
 public readonly struct RcGiConfig {
-    public readonly Material DistanceFieldMaterial;
-    public readonly Material RadianceCascadeMaterial;
     public readonly int NumberOfCascades;
     public readonly int Cascade0RayCount;
     public readonly float Cascade0Range;
@@ -20,8 +18,6 @@ public readonly struct RcGiConfig {
     public readonly float SunIntensity;
     
     public RcGiConfig(
-        Material distanceFieldMaterial,
-        Material radianceCascadeMaterial,
         int numberOfCascades,
         int cascade0RayCount,
         float cascade0ProbeDensity,
@@ -33,8 +29,6 @@ public readonly struct RcGiConfig {
         float sunAngularRadius,
         float sunIntensity
         ) {
-        DistanceFieldMaterial = distanceFieldMaterial;
-        RadianceCascadeMaterial = radianceCascadeMaterial;
         NumberOfCascades = numberOfCascades;
         Cascade0RayCount = cascade0RayCount;
         Cascade0ProbeDensity = cascade0ProbeDensity;

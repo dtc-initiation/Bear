@@ -9,6 +9,11 @@ using UnityEngine.Rendering.RenderGraphModule.Util;
 namespace BearRP.Features.IndirectLighting;
 
 public class IndirectLightingRenderFeature : RenderFeature {
+    // Materials
+    private Material _distanceFieldMaterial;
+    private Material _naiveMaterial;
+    private Material _cascadeMaterial;
+    
     // Configs
     private RcGiConfig RcGiConfig;
     private NaiveGiConfig NaiveGiConfig;
@@ -94,10 +99,12 @@ public class IndirectLightingRenderFeature : RenderFeature {
 
     #region JFA
     private void AddSeedPass(RenderGraph renderGraph, BearRPContext context) {
+        BearRPUtils.GetOrLoadMaterial(ref _distanceFieldMaterial, "Bear/DistanceField");
+        
         using (var builder = renderGraph.AddRasterRenderPass<JFAData>("JFA Seed", out var passData)) {
             passData.PassNumber = 0;
             passData.EmissionTexture = context.GiTextures.InputTexture;
-            passData.JfaMaterial = NaiveGiConfig.DistanceFieldMaterial;
+            passData.JfaMaterial = _distanceFieldMaterial;
             passData.JfaInput = JfaPingTH;
             
             builder.UseTexture(passData.EmissionTexture);
@@ -121,7 +128,7 @@ public class IndirectLightingRenderFeature : RenderFeature {
         for (int i = 0; i < numPass; i++) {
             using (var builder = renderGraph.AddRasterRenderPass<JFAData>($"JFA Pass {i}", out var passData)) {
                 passData.PassNumber = 1;
-                passData.JfaMaterial = NaiveGiConfig.DistanceFieldMaterial;
+                passData.JfaMaterial = _distanceFieldMaterial;
                 passData.JfaInput = jfaInput;
                 passData.JfaOutput = jfaOutput;
                 
@@ -152,7 +159,7 @@ public class IndirectLightingRenderFeature : RenderFeature {
     private TextureHandle AddDistanceFieldPass(RenderGraph renderGraph, BearRPContext context, TextureHandle jfaOutputTexture, TextureHandle dfOutputTexture) {
         using (var builder = renderGraph.AddRasterRenderPass<JFAData>("Distance Field", out var passData)) {
             passData.PassNumber = 2;
-            passData.JfaMaterial = NaiveGiConfig.DistanceFieldMaterial;
+            passData.JfaMaterial = _distanceFieldMaterial;
             passData.JfaOutput = jfaOutputTexture;
             passData.InternalResolution = new Vector2(context.BearCamera.GetPixelWidth(), context.BearCamera.GetPixelHeight());
             passData.DistanceField = dfOutputTexture;
@@ -185,9 +192,11 @@ public class IndirectLightingRenderFeature : RenderFeature {
         
     }
     private void AddNaiveRadiancePass(RenderGraph renderGraph, BearRPContext context, TextureHandle dfOutputTexture) {
+        BearRPUtils.GetOrLoadMaterial(ref _naiveMaterial, "Bear/NaiveGI");
+        
         // The output pass
         using (var builder = renderGraph.AddRasterRenderPass<NaiveGIData>("Naive Gathering Pass", out var passData)) {
-            passData.NaiveGIMaterial = NaiveGiConfig.NaiveGiMaterial;
+            passData.NaiveGIMaterial = _naiveMaterial;
             passData.EmissionInput = context.GiTextures.InputTexture;
             passData.DistanceField = dfOutputTexture;
             passData.EmissionOutput = context.GiTextures.OutputTexture;
@@ -227,11 +236,13 @@ public class IndirectLightingRenderFeature : RenderFeature {
     }
 
     private void AddRadianceCascadePass(RenderGraph renderGraph, BearRPContext context, TextureHandle dfOutputTexture) {
+        BearRPUtils.GetOrLoadMaterial(ref _cascadeMaterial, "Bear/RadianceCascades");
+        
         for (int cascadeNum = RcGiConfig.NumberOfCascades - 1; cascadeNum >= 0; cascadeNum--) {
             using (var builder = renderGraph.AddRasterRenderPass<RcGIData>($"Radiance Cascade {cascadeNum} Pass", out var passData)) {
                 var desc = CascadeTH[cascadeNum].GetDescriptor(renderGraph);
                 // Materials
-                passData.RadianceCascadeMaterial = RcGiConfig.RadianceCascadeMaterial;
+                passData.RadianceCascadeMaterial = _cascadeMaterial;
                 
                 // Internal Variables
                 passData.InternalResolution = context.BearCamera.GetPixelResolution();
@@ -304,7 +315,7 @@ public class IndirectLightingRenderFeature : RenderFeature {
     
     private void AddTranslateCascade0Pass(RenderGraph renderGraph, BearRPContext context) {
         using (var builder = renderGraph.AddRasterRenderPass<RcTranslateData>("Rc Final Mip", out var passData)) {
-            passData.RadianceCascadeMaterial = RcGiConfig.RadianceCascadeMaterial;
+            passData.RadianceCascadeMaterial = _cascadeMaterial;
             passData.Cascade0 = CascadeTH[0];
             passData.GIOutput = context.GiTextures.OutputTexture;
 

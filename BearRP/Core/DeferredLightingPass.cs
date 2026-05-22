@@ -7,22 +7,24 @@ using UnityEngine.Rendering.RenderGraphModule;
 namespace BearRP.Core;
 
 public class DeferredLightingPass : IBearPass {
-    private MaterialPropertyBlock _mpb = new ();
-    private DeferredLightingConfig _config;
+    private Material _deferredMaterial;
+    private MaterialPropertyBlock _mpb;
     private readonly Mesh _quad;
     
-    public DeferredLightingPass(DeferredLightingConfig config) {
-        _config = config;
+    public DeferredLightingPass() {
         _quad = BearRPUtils.CreateQuad();
+        _mpb = new MaterialPropertyBlock();
     }
     
     public void Record(RenderGraph renderGraph, BearRPContext context) {
         if (context.LightData.VisibleLights.Count == 0) {
             return;
         }
+        BearRPUtils.GetOrLoadMaterial(ref _deferredMaterial, "Bear/Deferred");
+        
         using (var builder = renderGraph.AddRasterRenderPass<DeferredLightingData>("Deferred Lighting Pass", out var passData)) {
             passData.BaseQuad = _quad;
-            passData.DeferredLightMaterial = _config.DeferredLightingMaterial;
+            passData.DeferredLightMaterial = _deferredMaterial;
             passData.Mpb = _mpb;
             passData.LightData = context.LightData.LightBuffer;
             passData.InstanceCount = context.LightData.VisibleLights.Count;

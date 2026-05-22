@@ -15,20 +15,16 @@ public class BearRPAsset : RenderPipelineAsset<BearRP> {
     [SerializeField] private Material blitMaterial = null!;
 
     [Header("Direct Lighting Settings")]
-    [SerializeField] public Material shadowMapMaterial = null!;
-    [SerializeField] public Material deferredMaterial = null!;
+    [SerializeField] public int angularResolution = 1024;
     
     [Header("Global Illumination Settings")]
     [SerializeField] public GIGatherMethod gatherMethod = GIGatherMethod.Naive;
-    [SerializeField] public Material distanceFieldMaterial = null!;
     
     [Header("Naive Illumination Settings")]
-    [SerializeField] private Material naiveMaterial = null!;
     [SerializeField] public int naiveGIRayCount = 8;
     [SerializeField] public int naiveMaxSteps = 32;
     
     [Header("Radiance Cascade Settings")]
-    [SerializeField] public Material radianceCascadeMaterial = null!;
     [SerializeField, Range(3, 6)] public int numberOfCascades = 4;
     [SerializeField] public int cascade0RayCount = 4;
     [SerializeField] public float cascade0ProbeDensity = 1f;
@@ -42,15 +38,9 @@ public class BearRPAsset : RenderPipelineAsset<BearRP> {
     [SerializeField, Range(0, 1f)] public float sunAngularRadius = 0.15f;
     [SerializeField, Range(0, 10f)] public float sunIntensity = 1f;
     
-    [Header("Debug")]
-    [SerializeField] private RenderTexture debugEmissiveInput = null!;
-
     public DebugOutputMode DebugOutput => debugOutputMode;
     public bool UseSharedCulling => useSharedCulling;
     public Material BlitMaterial => blitMaterial;
-    public Material NaiveMaterial => naiveMaterial;
-    public RenderTexture DebugEmissiveInput => debugEmissiveInput;
-    public Material DistanceFieldMaterial => distanceFieldMaterial;
     
     protected override RenderPipeline CreatePipeline() {
         return new BearRP(this);
