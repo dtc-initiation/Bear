@@ -126,6 +126,12 @@ public class BearRenderer {
             case (DebugOutputMode.Depth):
                 outputValue = _context.GBufferTextures.Depth;
                 break;
+            case (DebugOutputMode.JfaPing):
+                outputValue = _context.GiTextures.JfaPing;
+                break;
+            case (DebugOutputMode.JfaPong):
+                outputValue = _context.GiTextures.JfaPong;
+                break;
             case (DebugOutputMode.DirectLighting):
                 outputValue = _context.DiTextures.LightBuffer;
                 break;

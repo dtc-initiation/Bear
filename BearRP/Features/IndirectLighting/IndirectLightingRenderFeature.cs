@@ -66,6 +66,9 @@ public class IndirectLightingRenderFeature : RenderFeature {
         };
         JfaPingTH = renderGraph.CreateTexture(jfaPingDesc);
         JfaPongTH = renderGraph.CreateTexture(jfaPongDesc);
+
+        context.GiTextures.JfaPing = JfaPingTH;
+        context.GiTextures.JfaPong = JfaPongTH;
     }
 
     private void CreateRadianceCascades(RenderGraph renderGraph, BearRPContext context) {
