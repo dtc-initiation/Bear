@@ -11,19 +11,20 @@ using UnityEngine.Rendering.RenderGraphModule.Util;
 namespace BearRP.Core;
 
 public class BearRenderer {
-    private BearRPContext _context;
-    private CameraSetupPass _cameraSetupPass;
-    private DeferredLightingPass _deferredLightingPass;
-    private GBufferPass _gBufferPass;
+    private readonly BearRPContext _context;
+    private readonly CameraSetupPass _cameraSetupPass;
+    private readonly DeferredLightingPass _deferredLightingPass;
+    private readonly GBufferPass _gBufferPass;
+    private readonly CompositePass _compositePass;
     
     private RenderFeature[] _renderFeatures;
     
     public BearRenderer() {
         _context = new BearRPContext();
         _cameraSetupPass = new CameraSetupPass();
-        _deferredLightingPass = new DeferredLightingPass();
         _gBufferPass = new GBufferPass();
-        
+        _deferredLightingPass = new DeferredLightingPass();
+        _compositePass = new CompositePass();
         
         SetupRenderFeatures();
     }
@@ -81,8 +82,8 @@ public class BearRenderer {
                 feature.BeginFeature(renderGraph, _context);
                 feature.Record(renderGraph, _context);
             }
-
-            AddDebugBlitPass(renderGraph, _context.GBufferTextures);
+            _compositePass.Record(renderGraph, _context);
+            AddDebugBlitPass(renderGraph);
 
             renderGraph.EndRecordingAndExecute();
             unityContext.ExecuteCommandBuffer(_context.CommandBuffer);
@@ -106,29 +107,33 @@ public class BearRenderer {
     }
     
     
-    private bool AddDebugBlitPass(RenderGraph renderGraph, GBufferTextures gBuffer) {
+    private void AddDebugBlitPass(RenderGraph renderGraph) {
+        
         TextureHandle outputValue;
         switch (BearRP.RPAsset.DebugOutput) {
             case (DebugOutputMode.Final):
-                outputValue = gBuffer.Albedo;
+                outputValue = _context.OutputTexture;
                 break;
             case (DebugOutputMode.Albedo):
-                outputValue = gBuffer.Albedo;
+                outputValue = _context.GBufferTextures.Albedo;
                 break;
             case (DebugOutputMode.Normal):
-                outputValue = gBuffer.Normal;
+                outputValue = _context.GBufferTextures.Normal;
+                break;
+            case (DebugOutputMode.Emission):
+                outputValue = _context.GBufferTextures.Emission;
                 break;
             case (DebugOutputMode.Depth):
-                outputValue = gBuffer.Depth;
+                outputValue = _context.GBufferTextures.Depth;
                 break;
             case (DebugOutputMode.DirectLighting):
                 outputValue = _context.DiTextures.LightBuffer;
                 break;
-            case (DebugOutputMode.Emissive):
-                outputValue = _context.GiTextures.OutputTexture.IsValid() ? _context.GiTextures.OutputTexture : gBuffer.Albedo;
+            case (DebugOutputMode.IndirectLighting):
+                outputValue = _context.GiTextures.OutputTexture;
                 break;
             default:
-                outputValue = gBuffer.Albedo;
+                outputValue = _context.OutputTexture;
                 break;
         }
         var importParams = new ImportResourceParams {
@@ -140,15 +145,15 @@ public class BearRenderer {
             width = camTarget != null ? camTarget.width : Screen.width,
             height = camTarget != null ? camTarget.height : Screen.height,
             volumeDepth = 1,
-            msaaSamples = 1,
-            format = GraphicsFormat.R8G8B8A8_SRGB
+            msaaSamples = camTarget != null ? camTarget.antiAliasing : 1,
+            format = camTarget != null ? camTarget.graphicsFormat : GraphicsFormat.R8G8B8A8_SRGB
         };
         var backbuffer = renderGraph.ImportBackbuffer(BuiltinRenderTextureType.CameraTarget, backbufferDesc, importParams);
 
         if (_context.Camera.cameraType != CameraType.Game) {
             var blitParams = new RenderGraphUtils.BlitMaterialParameters(outputValue, backbuffer, BearRP.RPAsset.BlitMaterial, 0);
             renderGraph.AddBlitPass(blitParams, "DebugBlit");
-            return true;
+            return;
         }
         
         using (var builder = renderGraph.AddRasterRenderPass<DebugBlitData>("DebugBlit", out var passData)) {
@@ -163,8 +168,6 @@ public class BearRenderer {
                 Blitter.BlitTexture(rgContext.cmd, data.Source, new Vector4(1, 1, 0, 0), data.Material, 0);
             });
         }
-        
-        return true;
     }
 
     private Rect ComputeCenteredViewport(Camera camera, BearCamera bearCamera) {

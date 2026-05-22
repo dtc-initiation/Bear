@@ -4,9 +4,10 @@ public enum DebugOutputMode {
     Final,
     Albedo,
     Normal,
+    Emission,
     Depth,
-    Emissive,
     DirectLighting,
+    IndirectLighting,
     JfaPing,
     JfaPong,
 }

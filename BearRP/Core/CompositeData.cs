@@ -9,5 +9,5 @@ public class CompositeData {
     public TextureHandle DirectLighting;
     public TextureHandle IndirectLighting;
     public TextureHandle Emission;
-    public TextureHandle Final;
+    public TextureHandle Output;
 }

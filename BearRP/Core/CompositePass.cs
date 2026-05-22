@@ -18,6 +18,7 @@ public class CompositePass : IBearPass {
             passData.DirectLighting = context.DiTextures.LightBuffer;
             passData.IndirectLighting = context.GiTextures.OutputTexture;
             passData.Emission = context.GBufferTextures.Emission;
+            passData.Output = context.OutputTexture;
             
             builder.AllowPassCulling(false);
             builder.AllowGlobalStateModification(true);
@@ -25,6 +26,7 @@ public class CompositePass : IBearPass {
             builder.UseTexture(passData.DirectLighting);
             builder.UseTexture(passData.IndirectLighting);
             builder.UseTexture(passData.Emission);
+            builder.SetRenderAttachment(passData.Output, 0, AccessFlags.Write);
             builder.SetRenderFunc<CompositeData>(CompositePassInternal);
         }
     }
@@ -32,7 +34,7 @@ public class CompositePass : IBearPass {
     private static void CompositePassInternal(CompositeData data, RasterGraphContext context) {
         context.cmd.SetGlobalTexture(ShaderIDs.DirectLighting, data.DirectLighting);
         context.cmd.SetGlobalTexture(ShaderIDs.IndirectLighting, data.IndirectLighting);
-        context.cmd.SetGlobalTexture(ShaderIDs.Emission, data.Albedo);
+        context.cmd.SetGlobalTexture(ShaderIDs.Emission, data.Emission);
         Blitter.BlitTexture(context.cmd, data.Albedo, new Vector4(1, 1, 0, 0), data.CompositeMaterial, 0);
     }
 }
