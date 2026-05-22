@@ -80,8 +80,8 @@ public class BearRenderer {
             _context.CreateLightBuffer(renderGraph);
 
             _cameraSetupPass.Record(renderGraph, _context);
-            _gBufferPass.Record(renderGraph, _context);
             _deferredLightingPass.Record(renderGraph, _context);
+            _gBufferPass.Record(renderGraph, _context);
             foreach (RenderFeature feature in _renderFeatures) {
                 feature.ValidateFeature(renderGraph, _context);
                 feature.BeginFeature(renderGraph, _context);
@@ -110,35 +110,7 @@ public class BearRenderer {
         _context.Setup(unityContext, camera);
         return true;
     }
-
-    private bool AddGBufferPass(RenderGraph renderGraph, Camera camera) {
-        using (var builder = renderGraph.AddRasterRenderPass<GBufferData>("GBuffer", out var passData)) {
-            // Setting up data
-            var textures = _context.GBufferTextures;
-            builder.SetRenderAttachment(textures.Albedo, 0, AccessFlags.Write);
-            builder.SetRenderAttachment(textures.Normal, 1, AccessFlags.Write);
-            builder.SetRenderAttachmentDepth(textures.Depth, AccessFlags.Write);
-
-            CameraData data = camera.GetOrAddCameraData();
-            CullingResults cullingResults = data.CullingResults; 
-
-            ShaderTagId tagId = new ShaderTagId("GBuffer");
-            var sortingSettings = new SortingSettings(camera);
-            var drawSettings = new DrawingSettings(tagId, sortingSettings);
-            var filterSettings = FilteringSettings.defaultValue;
-
-            var rendererListParams = new RendererListParams(cullingResults, drawSettings, filterSettings);
-            passData.RendererList = renderGraph.CreateRendererList(rendererListParams);
-
-            builder.UseRendererList(passData.RendererList);
-            builder.SetRenderFunc<GBufferData>(GBufferAction);
-        }
-        return true;
-    }
-
-    private static void GBufferAction(GBufferData passData, RasterGraphContext context) {
-        context.cmd.DrawRendererList(passData.RendererList);
-    }
+    
     
     private bool AddDebugBlitPass(RenderGraph renderGraph, GBufferTextures gBuffer) {
         TextureHandle outputValue;

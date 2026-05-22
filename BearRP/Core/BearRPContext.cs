@@ -84,6 +84,14 @@ public class BearRPContext {
             filterMode = FilterMode.Point
         };
         GBufferTextures.Normal = renderGraph.CreateTexture(normalDesc);
+
+        var emissionDesc = new TextureDesc(BearCamera.GetPixelWidth(), BearCamera.GetPixelHeight()) {
+            name = "GBuffer_Emission",
+            clearBuffer = true,
+            clearColor = new Color(0f, 0f, 0f, 0f),
+            colorFormat = GraphicsFormat.R16G16B16A16_UNorm
+        };
+        GBufferTextures.Emission = renderGraph.CreateTexture(emissionDesc);
         
         var depthDesc = new TextureDesc(BearCamera.GetPixelWidth(), BearCamera.GetPixelHeight()) {
             name = "GBuffer_Depth",

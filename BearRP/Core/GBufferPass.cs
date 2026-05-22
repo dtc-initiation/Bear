@@ -7,10 +7,17 @@ namespace BearRP.Core;
 
 public class GBufferPass : IBearPass {
     public void Record(RenderGraph renderGraph, BearRPContext context) {
+        AddGBufferPass(renderGraph, context);
+    }
+    // TODO Create emission textures
+    // Create Normal Textures
+
+    private void AddGBufferPass(RenderGraph renderGraph, BearRPContext context) {
         using (var builder = renderGraph.AddRasterRenderPass<GBufferData>("GBuffer", out var passData)) {
             var textures = context.GBufferTextures;
             builder.SetRenderAttachment(textures.Albedo, 0, AccessFlags.Write);
             builder.SetRenderAttachment(textures.Normal, 1, AccessFlags.Write);
+            builder.SetRenderAttachment(textures.Emission, 2, AccessFlags.Write);
             builder.SetRenderAttachmentDepth(textures.Depth, AccessFlags.Write);
 
             CameraData cData = context.CameraData;
@@ -28,7 +35,8 @@ public class GBufferPass : IBearPass {
             builder.SetRenderFunc<GBufferData>(GBufferPassInternal);
         }
     }
-
+    
+    
     private void GBufferPassInternal(GBufferData data, RasterGraphContext context) {
         context.cmd.DrawRendererList(data.RendererList);
     }
