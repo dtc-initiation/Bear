@@ -29,11 +29,14 @@ public class DeferredLightingPass : IBearPass {
             passData.LightData = context.LightData.LightBuffer;
             passData.InstanceCount = context.LightData.VisibleLights.Count;
             passData.MaxLightCount = context.ShadowData.MaxLightCount;
+            passData.NormalMap = context.GBufferTextures.Normal;
+            passData.InternalResolution = new Vector2(context.BearCamera.GetPixelWidth(), context.BearCamera.GetPixelHeight());
             passData.Shadowmap = context.DiTextures.ShadowMap;
             passData.LightBuffer = context.DiTextures.LightBuffer;
 
             builder.AllowPassCulling(false);
             builder.AllowGlobalStateModification(true);
+            builder.UseTexture(passData.NormalMap);
             builder.UseTexture(passData.Shadowmap);
             builder.SetRenderAttachment(passData.LightBuffer, 0, AccessFlags.Write);    
             builder.SetRenderFunc<DeferredLightingData>(DeferredPass);
@@ -45,6 +48,8 @@ public class DeferredLightingPass : IBearPass {
         data.Mpb.SetFloat(ShaderIDs.MaxLightCount, data.MaxLightCount);
         data.Mpb.SetFloat(ShaderIDs.LightCount, data.InstanceCount);
         data.Mpb.SetFloat(ShaderIDs.Tau, Mathf.PI * 2f);
+        context.cmd.SetGlobalVector(ShaderIDs.InternalResolution, data.InternalResolution);
+        context.cmd.SetGlobalTexture(ShaderIDs.NormalMap, data.NormalMap);
         context.cmd.SetGlobalTexture(ShaderIDs.ShadowMap, data.Shadowmap);
         context.cmd.DrawMeshInstancedProcedural(data.BaseQuad, 0, data.DeferredLightMaterial, 0, data.InstanceCount, data.Mpb);
     }

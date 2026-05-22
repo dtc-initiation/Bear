@@ -73,8 +73,8 @@ public class BearRenderer {
             _context.CreateLightBuffer(renderGraph);
 
             _cameraSetupPass.Record(renderGraph, _context);
-            _deferredLightingPass.Record(renderGraph, _context);
             _gBufferPass.Record(renderGraph, _context);
+            _deferredLightingPass.Record(renderGraph, _context);
             foreach (RenderFeature feature in _renderFeatures) {
                 feature.ValidateFeature(renderGraph, _context);
                 feature.BeginFeature(renderGraph, _context);
