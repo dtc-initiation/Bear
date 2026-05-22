@@ -20,12 +20,14 @@ public class BearRPContext {
 
     public LightData LightData;
     public ShadowData ShadowData;
-    
     public ScriptableRenderContext UnityContext;
+    
+    public GBufferTextures GBufferTextures;
     public DirectIlluminationTextures DiTextures;
     public GlobalIlluminationTextures GiTextures;  
-    public GBufferTextures GBufferTextures;
 
+    public TextureHandle OutputTexture;
+    
     public void PassShadowData(LightData lightData, ShadowData shadowData) {
         LightData = lightData;
         ShadowData = shadowData;
@@ -102,18 +104,8 @@ public class BearRPContext {
         GBufferTextures.Depth = renderGraph.CreateTexture(depthDesc);
     }
     
-    // GI Debugging fields (TEMPORARY)
-    private RTHandle? _debugEmissiveTextureHandle;
-    
     public void CreateGITextures(RenderGraph renderGraph) {
         GiTextures.InputTexture = GBufferTextures.Emission;
-        // RenderTexture externalRT = BearRP.RPAsset.DebugEmissiveInput;
-        // if (_debugEmissiveTextureHandle == null) {
-        //     _debugEmissiveTextureHandle?.Release();
-        //     _debugEmissiveTextureHandle = RTHandles.Alloc(externalRT);
-        // }
-        // GiTextures.InputTexture = renderGraph.ImportTexture(_debugEmissiveTextureHandle);
-
         TextureDesc outputDesc = new TextureDesc(BearCamera.GetPixelWidth(), BearCamera.GetPixelHeight()) {
             name = "Gi Output",
             clearBuffer = true,
@@ -125,7 +117,18 @@ public class BearRPContext {
         GiTextures.OutputTexture = renderGraph.CreateTexture(outputDesc);
     }
 
+    public void CreateOutputTextures(RenderGraph renderGraph) {
+        TextureDesc outputDec = new TextureDesc(BearCamera.GetPixelWidth(), BearCamera.GetPixelHeight()) {
+            name = "Output",
+            clearBuffer = true,
+            clearColor = new Color(0f, 0f, 0f, 1f),
+            colorFormat = GraphicsFormat.R16G16B16A16_UNorm,
+            filterMode = FilterMode.Point,
+            wrapMode = TextureWrapMode.Clamp
+        };
+        OutputTexture = renderGraph.CreateTexture(outputDec);
+    }
+    
     public void Dispose() {
-        RTHandles.Release(_debugEmissiveTextureHandle);
     }
 }

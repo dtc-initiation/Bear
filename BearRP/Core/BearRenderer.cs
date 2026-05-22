@@ -69,8 +69,9 @@ public class BearRenderer {
             
             renderGraph.BeginRecording(_context.RGParams);
             _context.CreateGBufferTextures(renderGraph);
-            _context.CreateGITextures(renderGraph);
             _context.CreateLightBuffer(renderGraph);
+            _context.CreateGITextures(renderGraph);
+            _context.CreateOutputTextures(renderGraph);            
 
             _cameraSetupPass.Record(renderGraph, _context);
             _gBufferPass.Record(renderGraph, _context);
