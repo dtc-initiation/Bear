@@ -34,7 +34,7 @@ public class CompositePass : IBearPass {
     private static void CompositePassInternal(CompositeData data, RasterGraphContext context) {
         context.cmd.SetGlobalTexture(ShaderIDs.DirectLighting, data.DirectLighting);
         context.cmd.SetGlobalTexture(ShaderIDs.IndirectLighting, data.IndirectLighting);
-        context.cmd.SetGlobalTexture(ShaderIDs.Emission, data.Emission);
+        context.cmd.SetGlobalTexture(ShaderIDs.EmissionMap, data.Emission);
         Blitter.BlitTexture(context.cmd, data.Albedo, new Vector4(1, 1, 0, 0), data.CompositeMaterial, 0);
     }
 }

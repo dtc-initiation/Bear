@@ -16,9 +16,9 @@ public static class ShaderIDs {
     public static readonly int LightCount = GetID("_LightCount");
     public static readonly int NormalMap = GetID("_Normalmap");
     public static readonly int ShadowMap = GetID("_Shadowmap");
+    public static readonly int EmissionMap = GetID("_Emissionmap");
     
     // GI Related
-    public static readonly int Emission = GetID("_Emission");
     public static readonly int DistanceField = GetID("_DistanceField");
     
     // Naive Related
