@@ -52,7 +52,7 @@ public class IndirectLightingRenderFeature : RenderFeature {
             name = "jfaPing",
             clearBuffer = true,
             clearColor = new Color(0f, 0f, 0f, 0f),
-            colorFormat = GraphicsFormat.R16G16_SFloat,
+            colorFormat = GraphicsFormat.R32G32_SFloat,
             filterMode = FilterMode.Point,
             wrapMode = TextureWrapMode.Clamp
         };
@@ -60,7 +60,7 @@ public class IndirectLightingRenderFeature : RenderFeature {
             name = "jfaPong",
             clearBuffer = true,
             clearColor = new Color(0f, 0f, 0f, 0f),
-            colorFormat = GraphicsFormat.R16G16_SFloat,
+            colorFormat = GraphicsFormat.R32G32_SFloat,
             filterMode = FilterMode.Point,
             wrapMode = TextureWrapMode.Clamp
         };
