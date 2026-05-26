@@ -91,7 +91,8 @@ public class BearRPContext {
             name = "GBuffer_Emission",
             clearBuffer = true,
             clearColor = new Color(0f, 0f, 0f, 0f),
-            colorFormat = GraphicsFormat.R16G16B16A16_UNorm
+            colorFormat = GraphicsFormat.R16G16B16A16_UNorm,
+            filterMode = FilterMode.Point
         };
         GBufferTextures.Emission = renderGraph.CreateTexture(emissionDesc);
         

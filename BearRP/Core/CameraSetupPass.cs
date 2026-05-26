@@ -21,11 +21,13 @@ public class CameraSetupPass : IBearPass {
             }
 
             passData.CameraInfo = camInfo;
+            passData.InternalResolution = context.BearCamera.GetPixelResolution();
             
             builder.AllowPassCulling(false);
             builder.AllowGlobalStateModification(true);
             builder.SetRenderFunc((CameraData data, RasterGraphContext context) => {
                 context.cmd.SetGlobalVector(ShaderIDs.CameraInfo, passData.CameraInfo);
+                context.cmd.SetGlobalVector(ShaderIDs.InternalResolution, passData.InternalResolution);
             });
         }
     }

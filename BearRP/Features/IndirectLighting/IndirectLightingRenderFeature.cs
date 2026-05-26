@@ -135,7 +135,6 @@ public class IndirectLightingRenderFeature : RenderFeature {
                 passData.JfaInput = jfaInput;
                 passData.JfaOutput = jfaOutput;
                 
-                passData.InternalResolution = new Vector2(context.BearCamera.GetPixelWidth(), context.BearCamera.GetPixelHeight());
                 passData.JfaTOffset = (int) Mathf.Pow(2, numPass - i - 1);
                 passData.RayCount = NaiveGiConfig.RayCount;
                 passData.MaxSteps = NaiveGiConfig.MaxRaySteps;
@@ -152,7 +151,6 @@ public class IndirectLightingRenderFeature : RenderFeature {
     }
     
     private static void JumpFloodFill(JFAData passData, RasterGraphContext context) {
-        context.cmd.SetGlobalVector(ShaderIDs.InternalResolution, passData.InternalResolution);
         context.cmd.SetGlobalInt(ShaderIDs.JfaTOffset, passData.JfaTOffset);
         context.cmd.SetGlobalInt(ShaderIDs.NaiveGIMaxSteps, passData.MaxSteps);
         context.cmd.SetGlobalInt(ShaderIDs.NaiveGIRayCount, passData.RayCount);
@@ -164,7 +162,6 @@ public class IndirectLightingRenderFeature : RenderFeature {
             passData.PassNumber = 2;
             passData.JfaMaterial = _distanceFieldMaterial;
             passData.JfaOutput = jfaOutputTexture;
-            passData.InternalResolution = new Vector2(context.BearCamera.GetPixelWidth(), context.BearCamera.GetPixelHeight());
             passData.DistanceField = dfOutputTexture;
             
             builder.UseTexture(passData.JfaOutput);
@@ -178,7 +175,6 @@ public class IndirectLightingRenderFeature : RenderFeature {
     }
 
     private static void ComputeDistanceField(JFAData passData, RasterGraphContext context) {
-        context.cmd.SetGlobalVector(ShaderIDs.InternalResolution, passData.InternalResolution);
         Blitter.BlitTexture(context.cmd, passData.JfaOutput, new Vector4(1, 1, 0, 0), passData.JfaMaterial, passData.PassNumber);
     }
     
@@ -203,7 +199,6 @@ public class IndirectLightingRenderFeature : RenderFeature {
             passData.EmissionInput = context.GiTextures.InputTexture;
             passData.DistanceField = dfOutputTexture;
             passData.EmissionOutput = context.GiTextures.OutputTexture;
-            passData.InternalResolution = new Vector2(context.BearCamera.GetPixelWidth(), context.BearCamera.GetPixelHeight());
             passData.RayCount =  NaiveGiConfig.RayCount;
             passData.MaxSteps = NaiveGiConfig.MaxRaySteps;
             
@@ -217,7 +212,6 @@ public class IndirectLightingRenderFeature : RenderFeature {
     }
 
     private static void GatherNaiveRadiance(NaiveGIData passData, RasterGraphContext context) {
-        context.cmd.SetGlobalVector(ShaderIDs.InternalResolution, passData.InternalResolution);
         context.cmd.SetGlobalFloat(ShaderIDs.Tau, Mathf.PI * 2f);
         context.cmd.SetGlobalFloat(ShaderIDs.Epsilon, 0.00001f);
         context.cmd.SetGlobalInt(ShaderIDs.NaiveGIRayCount, passData.RayCount);
@@ -248,7 +242,6 @@ public class IndirectLightingRenderFeature : RenderFeature {
                 passData.RadianceCascadeMaterial = _cascadeMaterial;
                 
                 // Internal Variables
-                passData.InternalResolution = context.BearCamera.GetPixelResolution();
                 passData.CascadeResolution = new Vector2(desc.width, desc.height);
                 passData.ProbeDensity = new Vector2(RcGiConfig.Cascade0ProbeDensity, RcGiConfig.Cascade0ProbeDensity);
                 passData.CascadeCount = RcGiConfig.NumberOfCascades;
@@ -283,7 +276,6 @@ public class IndirectLightingRenderFeature : RenderFeature {
 
     private static void GatherCascades(RcGIData passData, RasterGraphContext context) {
         // Cascades
-        context.cmd.SetGlobalVector(ShaderIDs.InternalResolution,passData.InternalResolution);
         context.cmd.SetGlobalVector(ShaderIDs.CascadeResolution, passData.CascadeResolution);
         context.cmd.SetGlobalVector(ShaderIDs.ProbeDensity,      passData.ProbeDensity);
         context.cmd.SetGlobalInt(ShaderIDs.CascadeIndex,            passData.CascadeIndex);
@@ -324,7 +316,6 @@ public class IndirectLightingRenderFeature : RenderFeature {
 
             var desc = passData.Cascade0.GetDescriptor(renderGraph);
             passData.Cascade0Resolution = new Vector2(desc.width, desc.height);
-            passData.InternalResolution = context.BearCamera.GetPixelResolution();
 
             builder.UseTexture(passData.Cascade0);
             builder.SetRenderAttachment(passData.GIOutput, 0, AccessFlags.Write);
@@ -335,7 +326,6 @@ public class IndirectLightingRenderFeature : RenderFeature {
 
     private static void TranslateCascade0(RcTranslateData passData, RasterGraphContext context) {
         context.cmd.SetGlobalVector(ShaderIDs.CascadeResolution, passData.Cascade0Resolution);
-        context.cmd.SetGlobalVector(ShaderIDs.InternalResolution, passData.InternalResolution);
         Blitter.BlitTexture(context.cmd, passData.Cascade0, new Vector4(1, 1, 0, 0), passData.RadianceCascadeMaterial, 1);
     }
     
