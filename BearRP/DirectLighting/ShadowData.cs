@@ -130,8 +130,6 @@ public class ShadowData {
     }
 
     private static void ShadowmapPass(ShadowmapData data, RasterGraphContext context) {
-        context.cmd.SetGlobalFloat(ShaderIDs.Tau, Mathf.PI * 2f);
-        context.cmd.SetGlobalFloat(ShaderIDs.Pi, Mathf.PI);
         data.Mpb.SetBuffer(ShaderIDs.LightBuffer, data.LightBuffer);
         data.Mpb.SetFloat(ShaderIDs.LightCount, data.InstanceCount);
         data.Mpb.SetFloat(ShaderIDs.MaxLightCount, data.MaxLightCount);

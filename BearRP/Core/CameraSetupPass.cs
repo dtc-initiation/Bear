@@ -26,8 +26,10 @@ public class CameraSetupPass : IBearPass {
             builder.AllowPassCulling(false);
             builder.AllowGlobalStateModification(true);
             builder.SetRenderFunc((CameraData data, RasterGraphContext context) => {
+                // Camera Related
                 context.cmd.SetGlobalVector(ShaderIDs.CameraInfo, passData.CameraInfo);
                 context.cmd.SetGlobalVector(ShaderIDs.InternalResolution, passData.InternalResolution);
+                
             });
         }
     }

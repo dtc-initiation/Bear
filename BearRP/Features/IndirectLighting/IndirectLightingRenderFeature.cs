@@ -212,8 +212,6 @@ public class IndirectLightingRenderFeature : RenderFeature {
     }
 
     private static void GatherNaiveRadiance(NaiveGIData passData, RasterGraphContext context) {
-        context.cmd.SetGlobalFloat(ShaderIDs.Tau, Mathf.PI * 2f);
-        context.cmd.SetGlobalFloat(ShaderIDs.Epsilon, 0.00001f);
         context.cmd.SetGlobalInt(ShaderIDs.NaiveGIRayCount, passData.RayCount);
         context.cmd.SetGlobalInt(ShaderIDs.NaiveGIMaxSteps, passData.MaxSteps);
         context.cmd.SetGlobalTexture(ShaderIDs.DistanceField, passData.DistanceField);

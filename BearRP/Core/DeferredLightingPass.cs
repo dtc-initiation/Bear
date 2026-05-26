@@ -41,7 +41,6 @@ public class DeferredLightingPass : IBearPass {
         data.Mpb.SetBuffer(ShaderIDs.LightBuffer, data.LightData);
         data.Mpb.SetFloat(ShaderIDs.MaxLightCount, data.MaxLightCount);
         data.Mpb.SetFloat(ShaderIDs.LightCount, data.InstanceCount);
-        data.Mpb.SetFloat(ShaderIDs.Tau, Mathf.PI * 2f);
         context.cmd.SetGlobalTexture(ShaderIDs.NormalMap, data.NormalMap);
         context.cmd.SetGlobalTexture(ShaderIDs.ShadowMap, data.Shadowmap);
         context.cmd.DrawMeshInstancedProcedural(data.BaseQuad, 0, data.DeferredLightMaterial, 0, data.InstanceCount, data.Mpb);

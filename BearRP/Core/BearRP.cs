@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using BearRP.DirectLighting;
+using BearRP.Utils;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.RenderGraphModule;
@@ -34,7 +36,7 @@ public class BearRP : RenderPipeline {
     }
 
     protected override void Render(ScriptableRenderContext context, List<Camera> cameras) {
-        BeginFrame();
+        BeginFrame(context);
         SetupAndCull(context, cameras);
 
         // Setup lighting Data 
@@ -56,12 +58,47 @@ public class BearRP : RenderPipeline {
         EndFrame();
     }
 
-    private void BeginFrame() {
+    private void BeginFrame(ScriptableRenderContext context) {
         SharedCullingResults = null;
         
         // Debug Purposes only
         SharedCullingLightCount = 0;
         CameraLightCount.Clear();
+        
+        SetupGlobalConstants(context);
+    }
+
+    private void SetupGlobalConstants(ScriptableRenderContext context) {
+        RenderGraphParameters rgParams = new  RenderGraphParameters() {
+            commandBuffer = CommandBufferPool.Get(),
+            scriptableRenderContext = context,
+            currentFrameIndex = Time.frameCount
+        };
+
+        try {
+            _renderGraph.BeginRecording(rgParams);
+            using (var builder = _renderGraph.AddUnsafePass<BearGlobals>("GlobalConstants", out var passData)) {
+                builder.SetRenderFunc<BearGlobals>((data, context) => {
+                    // Global constants
+                    context.cmd.SetGlobalFloat(ShaderIDs.Tau, Mathf.PI * 2);
+                    context.cmd.SetGlobalFloat(ShaderIDs.Pi, Mathf.PI);
+                    context.cmd.SetGlobalFloat(ShaderIDs.Epsilon, 0.00001f);
+                });
+            }
+            _renderGraph.EndRecordingAndExecute();
+            context.ExecuteCommandBuffer(rgParams.commandBuffer);
+            context.Submit();
+        }
+        catch (Exception e) {
+            if (_renderGraph.ResetGraphAndLogException(e)) {
+                throw;
+            }
+        }
+        finally {
+            CommandBufferPool.Release(rgParams.commandBuffer);
+        }
+        
+        
     }
 
     private void SetupAndCull(ScriptableRenderContext context, List<Camera> cameras) {
