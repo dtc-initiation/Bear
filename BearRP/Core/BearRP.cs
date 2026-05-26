@@ -36,9 +36,15 @@ public class BearRP : RenderPipeline {
     }
 
     protected override void Render(ScriptableRenderContext context, List<Camera> cameras) {
+        RenderGraphParameters rgParams = new  RenderGraphParameters() {
+            commandBuffer = CommandBufferPool.Get(),
+            scriptableRenderContext = context,
+            currentFrameIndex = Time.frameCount
+        };
+        
         BeginFrame(context);
         SetupAndCull(context, cameras);
-
+        
         // Setup lighting Data 
         LightData.RegisterVisibleLights(SharedCullingResults, cameras);
         ShadowData.ReleaseDeadLights();
@@ -47,9 +53,27 @@ public class BearRP : RenderPipeline {
         
         // Draw onto shadowmap
         ShadowData.UpdateShadowMesh();
-        ShadowData.RecordShadowMapPass(_renderGraph, context, LightData);
         
+        try {
+            _renderGraph.BeginRecording(rgParams);
+            
+            SetupShaderGlobals();
+            ShadowData.RecordShadowMapPass(_renderGraph, context, LightData);
+            
+            _renderGraph.EndRecordingAndExecute();
+            context.ExecuteCommandBuffer(rgParams.commandBuffer);
+            context.Submit();
+        }
+        catch (Exception e) {
+            if (_renderGraph.ResetGraphAndLogException(e)) {
+                throw;
+            }
+        }
+        finally {
+            CommandBufferPool.Release(rgParams.commandBuffer);
+        }
         _renderer.PassShadowData(LightData, ShadowData);
+        
         foreach (Camera camera in cameras) {
             BeginCameraRendering(context, camera);
             _renderer.Render(_renderGraph, context, camera); 
@@ -64,41 +88,16 @@ public class BearRP : RenderPipeline {
         // Debug Purposes only
         SharedCullingLightCount = 0;
         CameraLightCount.Clear();
-        
-        SetupGlobalConstants(context);
     }
 
-    private void SetupGlobalConstants(ScriptableRenderContext context) {
-        RenderGraphParameters rgParams = new  RenderGraphParameters() {
-            commandBuffer = CommandBufferPool.Get(),
-            scriptableRenderContext = context,
-            currentFrameIndex = Time.frameCount
-        };
-
-        try {
-            _renderGraph.BeginRecording(rgParams);
-            using (var builder = _renderGraph.AddUnsafePass<BearGlobals>("GlobalConstants", out var passData)) {
-                builder.SetRenderFunc<BearGlobals>((data, context) => {
-                    // Global constants
-                    context.cmd.SetGlobalFloat(ShaderIDs.Tau, Mathf.PI * 2);
-                    context.cmd.SetGlobalFloat(ShaderIDs.Pi, Mathf.PI);
-                    context.cmd.SetGlobalFloat(ShaderIDs.Epsilon, 0.00001f);
-                });
-            }
-            _renderGraph.EndRecordingAndExecute();
-            context.ExecuteCommandBuffer(rgParams.commandBuffer);
-            context.Submit();
+    private void SetupShaderGlobals() {
+        using (var builder = _renderGraph.AddUnsafePass<BearGlobals>("GlobalConstants", out var passData)) {
+            builder.SetRenderFunc<BearGlobals>((data, context) => {
+                context.cmd.SetGlobalFloat(ShaderIDs.Tau, Mathf.PI * 2);
+                context.cmd.SetGlobalFloat(ShaderIDs.Pi, Mathf.PI);
+                context.cmd.SetGlobalFloat(ShaderIDs.Epsilon, 0.00001f);
+            });
         }
-        catch (Exception e) {
-            if (_renderGraph.ResetGraphAndLogException(e)) {
-                throw;
-            }
-        }
-        finally {
-            CommandBufferPool.Release(rgParams.commandBuffer);
-        }
-        
-        
     }
 
     private void SetupAndCull(ScriptableRenderContext context, List<Camera> cameras) {

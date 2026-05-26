@@ -70,63 +70,45 @@ public class ShadowData {
             return;
         }
         
-        RenderGraphParameters rgParams = new  RenderGraphParameters() {
-            commandBuffer = CommandBufferPool.Get(),
-            scriptableRenderContext = context,
-            currentFrameIndex = Time.frameCount
+        var wideImportParams = new ImportResourceParams() {
+            clearOnFirstUse = true,
+            clearColor = Color.white
         };
-        try {
-            renderGraph.BeginRecording(rgParams);
-            var wideImportParams = new ImportResourceParams() {
-                clearOnFirstUse = true,
-                clearColor = Color.white
-            };
-            _smWideTH = renderGraph.ImportTexture(_smWideTHInternal, wideImportParams);
-            
-            using (var builder = renderGraph.AddRasterRenderPass<ShadowmapData>("Shadowmap Pass", out var passData)) {
-                passData.NumPass = 0;
-                passData.ShadowMesh = _blockerMesh;
-                passData.ShadowmapMaterial = _shadowMapMaterial;
-                passData.LightBuffer = lightData.LightBuffer;
-                passData.InstanceCount = lightData.VisibleLights.Count;
-                passData.MaxLightCount = MaxLightCount;
-                passData.Mpb = _mpb;
+        _smWideTH = renderGraph.ImportTexture(_smWideTHInternal, wideImportParams);
+        
+        using (var builder = renderGraph.AddRasterRenderPass<ShadowmapData>("Shadowmap Pass", out var passData)) {
+            passData.NumPass = 0;
+            passData.ShadowMesh = _blockerMesh;
+            passData.ShadowmapMaterial = _shadowMapMaterial;
+            passData.LightBuffer = lightData.LightBuffer;
+            passData.InstanceCount = lightData.VisibleLights.Count;
+            passData.MaxLightCount = MaxLightCount;
+            passData.Mpb = _mpb;
 
-                builder.AllowPassCulling(false);
-                builder.AllowGlobalStateModification(true);
-                builder.SetRenderAttachment(_smWideTH, 0, AccessFlags.Write);
-                builder.SetRenderFunc<ShadowmapData>(ShadowmapPass);
-            }
-
-            var importParams = new ImportResourceParams() {
-                clearOnFirstUse = true,
-                clearColor = Color.white
-            };
-            _smTH = renderGraph.ImportTexture(_smTHInternal, importParams);
-
-            using (var builder = renderGraph.AddRasterRenderPass<ShadowMergeData>("Shadowmap Merge Pass", out var passData)) {
-                passData.NumPass = 1;
-                passData.ShadowMapMaterial = _shadowMapMaterial;
-                passData.WideHandle = _smWideTH;
-                
-                builder.AllowPassCulling(false);
-                builder.AllowGlobalStateModification(true);
-                builder.UseTexture(_smWideTH);
-                builder.SetRenderAttachment(_smTH, 0, AccessFlags.Write);
-                builder.SetRenderFunc<ShadowMergeData>(ShadowMergePass);
-            }
-            
-            renderGraph.EndRecordingAndExecute();
-            context.ExecuteCommandBuffer(rgParams.commandBuffer);
-            context.Submit();
-            
-        } catch (Exception e) {
-            if (renderGraph.ResetGraphAndLogException(e)) {
-                throw;
-            }
-        } finally {
-            CommandBufferPool.Release(rgParams.commandBuffer);
+            builder.AllowPassCulling(false);
+            builder.AllowGlobalStateModification(true);
+            builder.SetRenderAttachment(_smWideTH, 0, AccessFlags.Write);
+            builder.SetRenderFunc<ShadowmapData>(ShadowmapPass);
         }
+
+        var importParams = new ImportResourceParams() {
+            clearOnFirstUse = true,
+            clearColor = Color.white
+        };
+        _smTH = renderGraph.ImportTexture(_smTHInternal, importParams);
+
+        using (var builder = renderGraph.AddRasterRenderPass<ShadowMergeData>("Shadowmap Merge Pass", out var passData)) {
+            passData.NumPass = 1;
+            passData.ShadowMapMaterial = _shadowMapMaterial;
+            passData.WideHandle = _smWideTH;
+            
+            builder.AllowPassCulling(false);
+            builder.AllowGlobalStateModification(true);
+            builder.UseTexture(_smWideTH);
+            builder.SetRenderAttachment(_smTH, 0, AccessFlags.Write);
+            builder.SetRenderFunc<ShadowMergeData>(ShadowMergePass);
+        }
+            
     }
 
     private static void ShadowmapPass(ShadowmapData data, RasterGraphContext context) {
