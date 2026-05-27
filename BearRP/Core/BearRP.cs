@@ -92,10 +92,13 @@ public class BearRP : RenderPipeline {
 
     private void SetupShaderGlobals() {
         using (var builder = _renderGraph.AddUnsafePass<BearGlobals>("GlobalConstants", out var passData)) {
+            
+            builder.AllowGlobalStateModification(true);
+            builder.AllowPassCulling(false);
             builder.SetRenderFunc<BearGlobals>((data, context) => {
                 context.cmd.SetGlobalFloat(ShaderIDs.Tau, Mathf.PI * 2);
                 context.cmd.SetGlobalFloat(ShaderIDs.Pi, Mathf.PI);
-                context.cmd.SetGlobalFloat(ShaderIDs.Epsilon, 0.00001f);
+                context.cmd.SetGlobalFloat(ShaderIDs.Epsilon, 0.001f);
             });
         }
     }
