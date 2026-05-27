@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using BearRP.DirectLighting;
 using BearRP.Utils;
 using UnityEngine;
@@ -18,6 +19,10 @@ public class BearRP : RenderPipeline {
     public static Dictionary<Light, BearLight> BearLightLookup = new Dictionary<Light, BearLight>();
     public static Dictionary<Camera, BearCamera> BearCameraLookup = new Dictionary<Camera, BearCamera>();
     public static Dictionary<Camera, CameraData> CameraDataLookup = new Dictionary<Camera, CameraData>();
+
+    public static float LastFrameMs = 0f;
+    public static float SmoothedFps = 0f;
+    private readonly Stopwatch _frameStopwatch = new Stopwatch();
     
     // Temporary for debug purposes only
     public static int SharedCullingLightCount = 0;

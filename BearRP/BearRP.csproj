@@ -15,6 +15,14 @@
             <HintPath>$(UnityEditorPath)\Managed\UnityEngine\UnityEngine.CoreModule.dll</HintPath>
             <Private>false</Private>
         </Reference>
+        <Reference Include="UnityEngine.Editor">
+            <HintPath>$(UnityEditorPath)\Managed\UnityEditor.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="UnityEngine.IMGUIModule">
+            <HintPath>$(UnityEditorPath)\Managed\UnityEngine\UnityEngine.IMGUIModule.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
         <Reference Include="UnityEngine.Physics2DModule">
             <HintPath>$(UnityEditorPath)\Managed\UnityEngine\UnityEngine.Physics2DModule.dll</HintPath>
             <Private>false</Private>
