@@ -36,8 +36,8 @@ public class BearRP : RenderPipeline {
         RPAsset = rpAsset;
         _renderGraph = new RenderGraph();
         _renderer = new BearRenderer();
-        LightData = new LightData(64);
-        ShadowData = new ShadowData(8, 1024);
+        LightData = new LightData(RPAsset.maxNumberOfLights);
+        ShadowData = new ShadowData(RPAsset.maxNumberOfLights, (int) RPAsset.angularResolution);
     }
 
     protected override void Render(ScriptableRenderContext context, List<Camera> cameras) {

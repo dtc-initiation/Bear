@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using BearRP.DirectLighting;
+using UnityEngine;
 using UnityEngine.Rendering;
 
 namespace BearRP.Core;
@@ -15,7 +16,8 @@ public class BearRPAsset : RenderPipelineAsset<BearRP> {
     [SerializeField] private Material blitMaterial = null!;
 
     [Header("Direct Lighting Settings")]
-    [SerializeField] public int angularResolution = 1024;
+    [SerializeField] public int maxNumberOfLights = 64;
+    [SerializeField] public AngularResolution angularResolution = AngularResolution.Medium;
     
     [Header("Global Illumination Settings")]
     [SerializeField] public GIGatherMethod gatherMethod = GIGatherMethod.Naive;
