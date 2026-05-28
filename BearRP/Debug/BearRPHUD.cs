@@ -13,6 +13,7 @@ public class BearRpHUD : MonoBehaviour {
         ("RC Gather",   "GI.RcGather"),
         ("RC Mip",      "GI.RcMip"),
         ("RC Translate","GI.RcTranslate"),
+        ("RC Diffuse", "GI.Diffuse")
     };
     private Recorder[] _recorders = null!;
     private void OnEnable() {

@@ -20,6 +20,9 @@ public static class ShaderIDs {
     
     // GI Related
     public static readonly int DistanceField = GetID("_DistanceField");
+    public static readonly int DiffuseOffset = GetID("_DiffuseOffset");
+    public static readonly int OcclusionMap = GetID("_Occlusion");
+    public static readonly int Albedo = GetID("_Albedo");
     
     // Naive Related
     public static readonly int JfaTOffset = GetID("_JfaTOffset");

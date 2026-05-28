@@ -31,6 +31,7 @@ public class IndirectLightingRenderFeature : RenderFeature {
     private static readonly ProfilingSampler s_RcGather     = new("GI.RcGather");
     private static readonly ProfilingSampler s_RcMip        = new("GI.RcMip");
     private static readonly ProfilingSampler s_RcTranslate  = new("GI.RcTranslate");
+    private static readonly ProfilingSampler s_RcDiffuse    = new("GI.Diffuse");
 
     public IndirectLightingRenderFeature(RcGiConfig rcGiConfig, NaiveGiConfig naiveGiConfig) {
         RcGiConfig = rcGiConfig;
@@ -237,6 +238,11 @@ public class IndirectLightingRenderFeature : RenderFeature {
         AddRadianceCascadePass(renderGraph, context, distanceField);
         AddMipCascade0Pass(renderGraph, context);
         AddTranslateCascade0Pass(renderGraph, context);
+        AddDiffusePass(renderGraph, context);
+        
+        AddRadianceCascadePass(renderGraph, context, distanceField);
+        AddMipCascade0Pass(renderGraph, context);
+        AddTranslateCascade0Pass(renderGraph, context);
     }
 
     private void AddRadianceCascadePass(RenderGraph renderGraph, BearRPContext context, TextureHandle dfOutputTexture) {
@@ -334,6 +340,38 @@ public class IndirectLightingRenderFeature : RenderFeature {
     private static void TranslateCascade0(RcTranslateData passData, RasterGraphContext context) {
         context.cmd.SetGlobalVector(ShaderIDs.CascadeResolution, passData.Cascade0Resolution);
         Blitter.BlitTexture(context.cmd, passData.Cascade0, new Vector4(1, 1, 0, 0), passData.RadianceCascadeMaterial, 1);
+    }
+
+    private void AddDiffusePass(RenderGraph renderGraph, BearRPContext context) {
+        using (var builder = renderGraph.AddRasterRenderPass<DiffuseData>("Rc Diffuse", out var passData, s_RcDiffuse)) {
+            passData.DiffuseMaterial = _cascadeMaterial;
+            passData.NumPass = 2;
+            passData.DiffuseOffset = 1;
+            passData.Albedo = context.GBufferTextures.Albedo;
+            passData.Occlusion = context.GBufferTextures.Occlusion;
+            passData.Emission = context.GiTextures.InputTexture;
+            passData.IndirectLighting = context.GiTextures.OutputTexture;
+            passData.DiffuseOutput = context.GiTextures.DiffuseOutputTexture;            
+            
+            builder.AllowGlobalStateModification(true);
+            builder.AllowPassCulling(false);
+            builder.UseTexture(passData.Albedo);
+            builder.UseTexture(passData.Occlusion);
+            builder.UseTexture(passData.Emission);
+            builder.UseTexture(passData.IndirectLighting);
+            builder.SetRenderAttachment(passData.DiffuseOutput, 0, AccessFlags.Write);
+            builder.SetRenderFunc<DiffuseData>(Diffuse);
+            
+            context.GiTextures.InputTexture = passData.DiffuseOutput;
+        }
+    }
+
+    private void Diffuse(DiffuseData data, RasterGraphContext context) {
+        context.cmd.SetGlobalTexture(ShaderIDs.Albedo, data.Albedo);
+        context.cmd.SetGlobalTexture(ShaderIDs.OcclusionMap, data.Occlusion);
+        context.cmd.SetGlobalTexture(ShaderIDs.EmissionMap, data.Emission);
+        context.cmd.SetGlobalFloat(ShaderIDs.DiffuseOffset, data.DiffuseOffset);
+        Blitter.BlitTexture(context.cmd, data.IndirectLighting, new Vector4(1, 1, 0, 0), data.DiffuseMaterial, data.NumPass);
     }
     
     #endregion

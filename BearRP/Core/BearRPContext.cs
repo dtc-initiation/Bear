@@ -126,6 +126,16 @@ public class BearRPContext {
             wrapMode = TextureWrapMode.Clamp
         };
         GiTextures.OutputTexture = renderGraph.CreateTexture(outputDesc);
+
+        TextureDesc diffuseDesc = new TextureDesc(BearCamera.GetPixelWidth(), BearCamera.GetPixelHeight()) {
+            name = "Gi_Diffuse",
+            clearBuffer = true,
+            clearColor = new Color(0f, 0f, 0f, 0f),
+            colorFormat = GraphicsFormat.R16G16B16A16_UNorm,
+            filterMode = FilterMode.Point,
+            wrapMode = TextureWrapMode.Clamp
+        };
+        GiTextures.DiffuseOutputTexture = renderGraph.CreateTexture(diffuseDesc);
     }
 
     public void CreateOutputTextures(RenderGraph renderGraph) {
