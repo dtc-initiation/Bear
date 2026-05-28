@@ -13,6 +13,7 @@ public class LoadingSceneHandler : SceneHandler {
     protected override async Awaitable HandleSceneAsync() {
         await base.HandleSceneAsync();
         // TODO Move onto game scene
-        await SceneManager.LoadSceneAsync("RadianceCascadeScene");
+        // await SceneManager.LoadSceneAsync("RadianceCascadeScene");
+        await SceneManager.LoadSceneAsync("2.25DScene");
     }
 }

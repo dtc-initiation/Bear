@@ -129,6 +129,12 @@ public class BearRP : RenderPipeline {
     }
     
     protected override void Dispose(bool disposing) {
+        foreach (var kvp in BearCameraLookup) {
+            if (kvp.Key != null) {
+                kvp.Value.ResetCameraAspect();
+            }
+        }
+        
         _renderGraph.Cleanup();
         _renderer.Dispose();
         BearCameraLookup.Clear();

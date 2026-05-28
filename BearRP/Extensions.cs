@@ -32,6 +32,9 @@ public static class CameraExtensions {
 
     public static void SetupAndCull(this Camera camera, ScriptableRenderContext context) {
         CameraData data = GetOrAddCameraData(camera);
+        if (camera.cameraType == CameraType.Game) {
+            camera.GetOrAddBearCamera().ApplyCameraAspect();
+        }
         if (camera.TryGetCullingParameters(camera, out ScriptableCullingParameters cullingParams)) {
             data.CullingResults = context.Cull(ref cullingParams);
             
