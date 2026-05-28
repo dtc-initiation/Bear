@@ -16,6 +16,7 @@ public class GBufferPass : IBearPass {
             builder.SetRenderAttachment(textures.Albedo, 0, AccessFlags.Write);
             builder.SetRenderAttachment(textures.Normal, 1, AccessFlags.Write);
             builder.SetRenderAttachment(textures.Emission, 2, AccessFlags.Write);
+            builder.SetRenderAttachment(textures.Occlusion, 3, AccessFlags.Write);
             builder.SetRenderAttachmentDepth(textures.Depth, AccessFlags.Write);
 
             CameraData cData = context.CameraData;

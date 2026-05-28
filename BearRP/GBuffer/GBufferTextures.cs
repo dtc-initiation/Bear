@@ -6,5 +6,6 @@ public struct GBufferTextures {
     public TextureHandle Albedo;
     public TextureHandle Normal;
     public TextureHandle Emission;
+    public TextureHandle Occlusion;
     public TextureHandle Depth;
 }

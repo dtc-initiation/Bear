@@ -8,11 +8,10 @@ public class JFAData {
     public int PassNumber;
     
     // Input
-    public TextureHandle EmissionTexture;
+    public TextureHandle OcclusionTexture;
     public Material JfaMaterial = null!;
     
     // Internal Variables
-    public Vector2 InternalResolution;
     public int JfaTOffset;
     public int MaxSteps;
     public int RayCount;

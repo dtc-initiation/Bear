@@ -115,11 +115,11 @@ public class IndirectLightingRenderFeature : RenderFeature {
         
         using (var builder = renderGraph.AddRasterRenderPass<JFAData>("JFA Seed", out var passData, s_JfaSeed)) {
             passData.PassNumber = 0;
-            passData.EmissionTexture = context.GiTextures.InputTexture;
+            passData.OcclusionTexture = context.GiTextures.OcclusionTexture;
             passData.JfaMaterial = _distanceFieldMaterial;
             passData.JfaInput = JfaPingTH;
             
-            builder.UseTexture(passData.EmissionTexture);
+            builder.UseTexture(passData.OcclusionTexture);
             builder.SetRenderAttachment(passData.JfaInput, 0, AccessFlags.Write);
             builder.AllowGlobalStateModification(true);
             builder.AllowPassCulling(false);
@@ -128,7 +128,7 @@ public class IndirectLightingRenderFeature : RenderFeature {
     }
 
     private static void PopulateJfaSeed(JFAData passData, RasterGraphContext context) {
-        Blitter.BlitTexture(context.cmd, passData.EmissionTexture, new Vector4(1, 1, 0, 0), passData.JfaMaterial, passData.PassNumber);
+        Blitter.BlitTexture(context.cmd, passData.OcclusionTexture, new Vector4(1, 1, 0, 0), passData.JfaMaterial, passData.PassNumber);
     }
 
     private (TextureHandle, TextureHandle) AddPingPongPass(RenderGraph renderGraph, BearRPContext context) {
