@@ -13,7 +13,7 @@ public class BearRpHUD : MonoBehaviour {
         ("RC Gather",   "GI.RcGather"),
         ("RC Mip",      "GI.RcMip"),
         ("RC Translate","GI.RcTranslate"),
-        ("RC Diffuse", "GI.Diffuse")
+        ("RC Diffuse",  "GI.Diffuse")
     };
     private Recorder[] _recorders = null!;
     private void OnEnable() {
@@ -33,7 +33,7 @@ public class BearRpHUD : MonoBehaviour {
         double gpuMs = _timings[0].gpuFrameTime;
         double frameMs = System.Math.Max(cpuMs, gpuMs);
         
-        GUILayout.BeginArea(new Rect(10, 10, 260, 180*2), GUI.skin.box);
+        GUILayout.BeginArea(new Rect(10, 10, 260, 180*3), GUI.skin.box);
         GUILayout.Label($"CPU: {cpuMs:F2} ms");
         GUILayout.Label($"GPU: {gpuMs:F2} ms");
         GUILayout.Label($"FPS: {(frameMs > 0 ? 1000.0 / frameMs : 0):F1}");

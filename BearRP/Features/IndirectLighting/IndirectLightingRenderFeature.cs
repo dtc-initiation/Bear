@@ -235,6 +235,7 @@ public class IndirectLightingRenderFeature : RenderFeature {
         AddSeedPass(renderGraph, context);
         var (jfaFinal, jfaScratch) = AddPingPongPass(renderGraph, context);
         var distanceField = AddDistanceFieldPass(renderGraph, context, jfaFinal, jfaScratch);
+
         AddRadianceCascadePass(renderGraph, context, distanceField);
         AddMipCascade0Pass(renderGraph, context);
         AddTranslateCascade0Pass(renderGraph, context);

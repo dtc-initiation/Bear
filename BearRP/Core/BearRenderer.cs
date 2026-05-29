@@ -36,6 +36,7 @@ public class BearRenderer {
             BearRP.RPAsset.cascade0RayCount,
             BearRP.RPAsset.cascade0ProbeDensity,
             BearRP.RPAsset.cascade0Offset,
+            BearRP.RPAsset.cascadeBounceCount,
             BearRP.RPAsset.skyboxOn,
             BearRP.RPAsset.skyColor,
             BearRP.RPAsset.sunColor,

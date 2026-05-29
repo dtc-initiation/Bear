@@ -9,6 +9,9 @@ public readonly struct RcGiConfig {
     public readonly float Cascade0Range;
     public readonly float Cascade0ProbeDensity;
     
+    // Bounce related
+    public readonly int BounceCount;
+    
     // Skybox Related
     public readonly bool SkyBoxOn;
     public readonly Color SkyColor;
@@ -22,6 +25,7 @@ public readonly struct RcGiConfig {
         int cascade0RayCount,
         float cascade0ProbeDensity,
         float cascade0Range,
+        int bounceCount,
         bool skyboxOn,
         Color skyColor,
         Color sunColor,
@@ -33,6 +37,7 @@ public readonly struct RcGiConfig {
         Cascade0RayCount = cascade0RayCount;
         Cascade0ProbeDensity = cascade0ProbeDensity;
         Cascade0Range = cascade0Range;
+        BounceCount = bounceCount;
         SkyBoxOn = skyboxOn;
         SkyColor = skyColor;
         SunColor = sunColor;
