@@ -16,7 +16,7 @@ public class CompositePass : IBearPass {
             passData.CompositeMaterial =  _compositeMaterial;
             passData.Albedo = context.GBufferTextures.Albedo;
             passData.DirectLighting = context.DiTextures.LightBuffer;
-            passData.IndirectLighting = context.GiTextures.OutputTexture;
+            passData.IndirectLighting = context.GiTextures.GiOutput;
             passData.Emission = context.GBufferTextures.Emission;
             passData.Output = context.OutputTexture;
             

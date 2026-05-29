@@ -3,10 +3,9 @@
 namespace BearRP.Features.IndirectLighting;
 
 public struct GlobalIlluminationTextures {
-    public TextureHandle OcclusionTexture;
-    public TextureHandle InputTexture;
-    public TextureHandle OutputTexture;
-    public TextureHandle DiffuseOutputTexture;
+    public TextureHandle Occlusion;
+    public TextureHandle GiInput;
+    public TextureHandle GiOutput;
 
     public TextureHandle JfaPing;
     public TextureHandle JfaPong;

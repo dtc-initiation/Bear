@@ -137,7 +137,7 @@ public class BearRenderer {
                 outputValue = _context.DiTextures.LightBuffer;
                 break;
             case (DebugOutputMode.IndirectLighting):
-                outputValue = _context.GiTextures.OutputTexture;
+                outputValue = _context.GiTextures.GiOutput;
                 break;
             default:
                 outputValue = _context.OutputTexture;

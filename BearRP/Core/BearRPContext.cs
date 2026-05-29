@@ -115,8 +115,8 @@ public class BearRPContext {
     }
     
     public void CreateGITextures(RenderGraph renderGraph) {
-        GiTextures.OcclusionTexture = GBufferTextures.Occlusion;
-        GiTextures.InputTexture = GBufferTextures.Emission;
+        GiTextures.Occlusion = GBufferTextures.Occlusion;
+        GiTextures.GiInput = GBufferTextures.Emission;
         TextureDesc outputDesc = new TextureDesc(BearCamera.GetPixelWidth(), BearCamera.GetPixelHeight()) {
             name = "Gi Output",
             clearBuffer = true,
@@ -125,17 +125,7 @@ public class BearRPContext {
             filterMode = FilterMode.Point,
             wrapMode = TextureWrapMode.Clamp
         };
-        GiTextures.OutputTexture = renderGraph.CreateTexture(outputDesc);
-
-        TextureDesc diffuseDesc = new TextureDesc(BearCamera.GetPixelWidth(), BearCamera.GetPixelHeight()) {
-            name = "Gi_Diffuse",
-            clearBuffer = true,
-            clearColor = new Color(0f, 0f, 0f, 0f),
-            colorFormat = GraphicsFormat.R16G16B16A16_UNorm,
-            filterMode = FilterMode.Point,
-            wrapMode = TextureWrapMode.Clamp
-        };
-        GiTextures.DiffuseOutputTexture = renderGraph.CreateTexture(diffuseDesc);
+        GiTextures.GiOutput = renderGraph.CreateTexture(outputDesc);
     }
 
     public void CreateOutputTextures(RenderGraph renderGraph) {

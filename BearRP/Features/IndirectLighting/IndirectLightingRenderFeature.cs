@@ -22,6 +22,8 @@ public class IndirectLightingRenderFeature : RenderFeature {
     private TextureHandle[] CascadeTH;
     private TextureHandle JfaPingTH;
     private TextureHandle JfaPongTH;
+    private TextureHandle DiffusePing;
+    private TextureHandle DiffusePong;
     
     // Performance metrics
     private static readonly ProfilingSampler s_JfaSeed      = new("GI.JfaSeed");
@@ -57,7 +59,7 @@ public class IndirectLightingRenderFeature : RenderFeature {
     }
 
     private void CreateDistanceFieldTextures(RenderGraph renderGraph, BearRPContext context) {
-        var inputDesc = context.GiTextures.InputTexture.GetDescriptor(renderGraph);
+        var inputDesc = context.GiTextures.GiInput.GetDescriptor(renderGraph);
         var jfaPingDesc = new TextureDesc(inputDesc.width, inputDesc.height) {
             name = "jfaPing",
             clearBuffer = true,
@@ -97,6 +99,25 @@ public class IndirectLightingRenderFeature : RenderFeature {
             };
             CascadeTH[cascadeNum] = renderGraph.CreateTexture(desc);
         }
+        
+        TextureDesc diffusePingDesc = new TextureDesc(context.BearCamera.GetPixelWidth(), context.BearCamera.GetPixelHeight()) {
+            name = "Gi_Diffuse_Ping",
+            clearBuffer = true,
+            clearColor = new Color(0f, 0f, 0f, 0f),
+            colorFormat = GraphicsFormat.R16G16B16A16_UNorm,
+            filterMode = FilterMode.Point,
+            wrapMode = TextureWrapMode.Clamp
+        };
+        TextureDesc diffusePongDesc = new TextureDesc(context.BearCamera.GetPixelWidth(), context.BearCamera.GetPixelHeight()) {
+            name = "Gi_Diffuse_Pong",
+            clearBuffer = true,
+            clearColor = new Color(0f, 0f, 0f, 0f),
+            colorFormat = GraphicsFormat.R16G16B16A16_UNorm,
+            filterMode = FilterMode.Point,
+            wrapMode = TextureWrapMode.Clamp
+        };
+        DiffusePing = renderGraph.CreateTexture(diffusePingDesc);
+        DiffusePong = renderGraph.CreateTexture(diffusePongDesc);
     }
 
     public override void Record(RenderGraph renderGraph, BearRPContext context) {
@@ -116,7 +137,7 @@ public class IndirectLightingRenderFeature : RenderFeature {
         
         using (var builder = renderGraph.AddRasterRenderPass<JFAData>("JFA Seed", out var passData, s_JfaSeed)) {
             passData.PassNumber = 0;
-            passData.OcclusionTexture = context.GiTextures.OcclusionTexture;
+            passData.OcclusionTexture = context.GiTextures.Occlusion;
             passData.JfaMaterial = _distanceFieldMaterial;
             passData.JfaInput = JfaPingTH;
             
@@ -206,9 +227,9 @@ public class IndirectLightingRenderFeature : RenderFeature {
         // The output pass
         using (var builder = renderGraph.AddRasterRenderPass<NaiveGIData>("Naive Gathering Pass", out var passData, s_NaiveGather)) {
             passData.NaiveGIMaterial = _naiveMaterial;
-            passData.EmissionInput = context.GiTextures.InputTexture;
+            passData.EmissionInput = context.GiTextures.GiInput;
             passData.DistanceField = dfOutputTexture;
-            passData.EmissionOutput = context.GiTextures.OutputTexture;
+            passData.EmissionOutput = context.GiTextures.GiOutput;
             passData.RayCount =  NaiveGiConfig.RayCount;
             passData.MaxSteps = NaiveGiConfig.MaxRaySteps;
             
@@ -235,18 +256,27 @@ public class IndirectLightingRenderFeature : RenderFeature {
         AddSeedPass(renderGraph, context);
         var (jfaFinal, jfaScratch) = AddPingPongPass(renderGraph, context);
         var distanceField = AddDistanceFieldPass(renderGraph, context, jfaFinal, jfaScratch);
+        AddRcGather(renderGraph, context, distanceField, context.GiTextures.GiInput);
+        AddBouncePass(renderGraph, context, distanceField);
+    }
 
-        AddRadianceCascadePass(renderGraph, context, distanceField);
-        AddMipCascade0Pass(renderGraph, context);
-        AddTranslateCascade0Pass(renderGraph, context);
-        AddDiffusePass(renderGraph, context);
-        
-        AddRadianceCascadePass(renderGraph, context, distanceField);
+    private void AddRcGather(RenderGraph renderGraph, BearRPContext context, TextureHandle distanceField, TextureHandle emission) {
+        AddRadianceCascadePass(renderGraph, context, distanceField, emission);
         AddMipCascade0Pass(renderGraph, context);
         AddTranslateCascade0Pass(renderGraph, context);
     }
 
-    private void AddRadianceCascadePass(RenderGraph renderGraph, BearRPContext context, TextureHandle dfOutputTexture) {
+    private void AddBouncePass(RenderGraph renderGraph, BearRPContext context, TextureHandle distanceField) {
+        TextureHandle diffuseInput = DiffusePing;
+        TextureHandle diffuseOutput = DiffusePong;
+        for (int numBounce = 0; numBounce < RcGiConfig.BounceCount; numBounce++) {
+            AddDiffusePass(renderGraph, context, diffuseOutput);
+            AddRcGather(renderGraph, context, distanceField, diffuseOutput);
+            (diffuseInput, diffuseOutput) = (diffuseOutput, diffuseInput);
+        }
+    }
+    
+    private void AddRadianceCascadePass(RenderGraph renderGraph, BearRPContext context, TextureHandle dfOutputTexture, TextureHandle emission) {
         BearRPUtils.GetOrLoadMaterial(ref _cascadeMaterial, "Bear/RadianceCascades");
         
         for (int cascadeNum = RcGiConfig.NumberOfCascades - 1; cascadeNum >= 0; cascadeNum--) {
@@ -263,7 +293,7 @@ public class IndirectLightingRenderFeature : RenderFeature {
                 passData.CascadeIntervalLength = RcGiConfig.Cascade0Range;
 
                 // Textures
-                passData.Emission = context.GiTextures.InputTexture;
+                passData.Emission = emission;
                 passData.DistanceField = dfOutputTexture;
                 passData.CascadeN0 = CascadeTH[passData.CascadeIndex];
 
@@ -326,7 +356,7 @@ public class IndirectLightingRenderFeature : RenderFeature {
         using (var builder = renderGraph.AddRasterRenderPass<RcTranslateData>("Rc Final Mip", out var passData, s_RcTranslate)) {
             passData.RadianceCascadeMaterial = _cascadeMaterial;
             passData.Cascade0 = CascadeTH[0];
-            passData.GIOutput = context.GiTextures.OutputTexture;
+            passData.GIOutput = context.GiTextures.GiOutput;
 
             var desc = passData.Cascade0.GetDescriptor(renderGraph);
             passData.Cascade0Resolution = new Vector2(desc.width, desc.height);
@@ -343,16 +373,16 @@ public class IndirectLightingRenderFeature : RenderFeature {
         Blitter.BlitTexture(context.cmd, passData.Cascade0, new Vector4(1, 1, 0, 0), passData.RadianceCascadeMaterial, 1);
     }
 
-    private void AddDiffusePass(RenderGraph renderGraph, BearRPContext context) {
+    private void AddDiffusePass(RenderGraph renderGraph, BearRPContext context, TextureHandle diffuseOutput) {
         using (var builder = renderGraph.AddRasterRenderPass<DiffuseData>("Rc Diffuse", out var passData, s_RcDiffuse)) {
             passData.DiffuseMaterial = _cascadeMaterial;
             passData.NumPass = 2;
             passData.DiffuseOffset = 1;
             passData.Albedo = context.GBufferTextures.Albedo;
             passData.Occlusion = context.GBufferTextures.Occlusion;
-            passData.Emission = context.GiTextures.InputTexture;
-            passData.IndirectLighting = context.GiTextures.OutputTexture;
-            passData.DiffuseOutput = context.GiTextures.DiffuseOutputTexture;            
+            passData.Emission = context.GiTextures.GiInput;
+            passData.IndirectLighting = context.GiTextures.GiOutput;
+            passData.DiffuseOutput = diffuseOutput;            
             
             builder.AllowGlobalStateModification(true);
             builder.AllowPassCulling(false);
@@ -362,8 +392,6 @@ public class IndirectLightingRenderFeature : RenderFeature {
             builder.UseTexture(passData.IndirectLighting);
             builder.SetRenderAttachment(passData.DiffuseOutput, 0, AccessFlags.Write);
             builder.SetRenderFunc<DiffuseData>(Diffuse);
-            
-            context.GiTextures.InputTexture = passData.DiffuseOutput;
         }
     }
 

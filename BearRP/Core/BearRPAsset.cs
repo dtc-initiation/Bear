@@ -31,7 +31,7 @@ public class BearRPAsset : RenderPipelineAsset<BearRP> {
     [SerializeField] public int cascade0RayCount = 4;
     [SerializeField] public float cascade0ProbeDensity = 1f;
     [SerializeField, Range(0, 100)] public float cascade0Offset = 1f;
-    [SerializeField, Range(0, 50)] public int cascadeBounceCount = 1;
+    [SerializeField, Range(0, 4)] public int cascadeBounceCount = 1;
 
     [Header("Radiance Cascade SkyBox")] 
     [SerializeField] public bool skyboxOn = false;
