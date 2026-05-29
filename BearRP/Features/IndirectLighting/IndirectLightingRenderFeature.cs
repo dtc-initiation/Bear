@@ -78,9 +78,6 @@ public class IndirectLightingRenderFeature : RenderFeature {
         };
         JfaPingTH = renderGraph.CreateTexture(jfaPingDesc);
         JfaPongTH = renderGraph.CreateTexture(jfaPongDesc);
-
-        context.GiTextures.JfaPing = JfaPingTH;
-        context.GiTextures.JfaPong = JfaPongTH;
     }
 
     private void CreateRadianceCascades(RenderGraph renderGraph, BearRPContext context) {
@@ -137,7 +134,7 @@ public class IndirectLightingRenderFeature : RenderFeature {
         
         using (var builder = renderGraph.AddRasterRenderPass<JFAData>("JFA Seed", out var passData, s_JfaSeed)) {
             passData.PassNumber = 0;
-            passData.OcclusionTexture = context.GiTextures.Occlusion;
+            passData.OcclusionTexture = context.GBufferTextures.Occlusion;
             passData.JfaMaterial = _distanceFieldMaterial;
             passData.JfaInput = JfaPingTH;
             

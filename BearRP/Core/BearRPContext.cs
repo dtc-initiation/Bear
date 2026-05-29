@@ -115,7 +115,6 @@ public class BearRPContext {
     }
     
     public void CreateGITextures(RenderGraph renderGraph) {
-        GiTextures.Occlusion = GBufferTextures.Occlusion;
         GiTextures.GiInput = GBufferTextures.Emission;
         TextureDesc outputDesc = new TextureDesc(BearCamera.GetPixelWidth(), BearCamera.GetPixelHeight()) {
             name = "Gi Output",
